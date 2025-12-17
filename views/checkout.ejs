@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('partials/head') %>
+</head>
+
+<body class="bg-gray-50">
+    <%- include('partials/header') %>
+        <div class="mt-24 container mx-auto px-4 py-8 max-w-2xl">
+            <h1 class="text-3xl font-bold mb-8 text-center">Checkout</h1>
+            <form id="checkout-form" class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+                <h2 class="text-xl font-semibold mb-4">Shipping Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input type="text" placeholder="First Name" class="p-3 border rounded w-full" required>
+                    <input type="text" placeholder="Last Name" class="p-3 border rounded w-full" required>
+                </div>
+                <input type="text" placeholder="Address" class="p-3 border rounded w-full mb-4" required>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <input type="text" placeholder="City" class="p-3 border rounded w-full" required>
+                    <input type="text" placeholder="State" class="p-3 border rounded w-full" required>
+                    <input type="text" placeholder="ZIP Code" class="p-3 border rounded w-full" required>
+                </div>
+
+                <h2 class="text-xl font-semibold mb-4 mt-6">Payment</h2>
+                <div class="p-4 border rounded mb-4 bg-gray-50">
+                    <p>Payment integration (Stripe/PayPal) placeholder.</p>
+                    <p class="text-sm text-gray-500">For this demo, order will be placed successfully on submit.</p>
+                </div>
+
+                <div class="flex justify-between items-center text-xl font-bold mt-6 border-t pt-4">
+                    <span>Total:</span>
+                    <span>$<span id="checkout-total">0.00</span></span>
+                </div>
+
+                <button type="submit"
+                    class="bg-black text-white w-full py-4 rounded-xl mt-6 hover:bg-gray-800 font-bold">Place
+                    Order</button>
+            </form>
+        </div>
+        <%- include('partials/footer') %>
+            <script>
+                // Load total
+                const cart = JSON.parse(localStorage.getItem('cart') || '{}');
+                let total = 0;
+                // This is a rough estimation since we don't have product data here directly easily without async
+                // In real app, we would recalculate properly or pass from cart page
+                document.getElementById('checkout-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    // Clear cart
+                    localStorage.removeItem('cart');
+                    window.location.href = '/order-confirmation';
+                });
+            </script>
+</body>
+
+</html>

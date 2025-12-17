@@ -1,0 +1,86 @@
+<nav class="px-5 pb-5 sm:pb-0 pt-5 fixed top-0 w-screen z-50 bg-white shadow-md">
+    <div class="flex sm:justify-between gap-3 items-center px-3">
+        <!-- Logo -->
+        <a href="/" class="kanit-bold text-xl cursor-pointer" style="text-decoration: none; color: inherit;">
+            BR.<span class="text-cs_gray">F</span>
+        </a>
+
+        <!-- Search -->
+        <div class="relative w-full sm:w-[22rem] max-w-md" id="search-container">
+            <div class="bg-white px-4 py-2 flex items-center font-light gap-3 rounded-xl w-full shadow-sm"
+                style="border: 1px solid #eee;">
+                <i class="ph ph-magnifying-glass" style="font-size: 20px; color: #a4a4a4;"></i>
+                <input id="search-input" type="text" placeholder="Type to search.."
+                    class="w-full text-sm bg-transparent focus:outline-none" style="border: none; outline: none;" />
+            </div>
+            <!-- Search Results Dropdown -->
+            <div id="search-results"
+                class="absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-50 hidden">
+                <ul class="flex flex-col ml-1 p-1 max-h-48 overflow-y-scroll" id="search-list">
+                    <!-- JS will populate this -->
+                </ul>
+            </div>
+        </div>
+
+        <!-- Icons -->
+        <div class="flex gap-6 kanit-semibold items-center">
+            <a href="/cart" class="hidden sm:flex relative flex-col gap-1 items-center cursor-pointer"
+                style="text-decoration: none; color: inherit;">
+                <i class="ph ph-handbag" style="font-size: 20px;"></i>
+                <div id="cart-count"
+                    class="bg-cs_yellow absolute left-3 bottom-6 text-sm text-center rounded-full px-1.5 w-auto h-5 flex items-center justify-center">
+                    0</div>
+                <h2 class="text-xs">Cart</h2>
+            </a>
+            <a href="/favorites" class="hidden sm:flex flex-col gap-1 items-center cursor-pointer"
+                style="text-decoration: none; color: inherit;">
+                <i class="ph ph-heart" style="font-size: 20px;"></i>
+                <h2 class="text-xs">Favorites</h2>
+            </a>
+            <a href="/profile" class="w-9 h-9 relative">
+                <img id="nav-profile-pic" src="https://via.placeholder.com/150"
+                    class="w-full h-full rounded-full object-cover" alt="Profile">
+            </a>
+
+            <!-- Mobile Menu Toggle -->
+            <div class="sm:hidden flex items-center">
+                <button id="mobile-menu-btn" class="p-2" style="background: none; border: none; cursor: pointer;">
+                    <i class="ph ph-list" style="font-size: 24px;"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <div class="sm:flex mt-2 hidden shadow-gray-400 text-sm justify-center gap-6 pb-2">
+        <a href="/" class="px-3 cs-underline" style="text-decoration: none; color: inherit;">Home</a>
+        <a href="/woman" class="px-3 cs-underline" style="text-decoration: none; color: inherit;">Woman</a>
+        <a href="/man" class="px-3 cs-underline" style="text-decoration: none; color: inherit;">Man</a>
+        <a href="/kids" class="px-3 cs-underline" style="text-decoration: none; color: inherit;">Kids</a>
+        <a href="/sports" class="px-3 cs-underline" style="text-decoration: none; color: inherit;">Sports</a>
+        <a href="/sale" class="px-3 cs-underline" style="text-decoration: none; color: inherit;">Sale</a>
+    </div>
+
+    <!-- Mobile Dropdown -->
+    <div id="mobile-menu"
+        class="hidden absolute top-full left-0 right-0 bg-white border border-gray-200 shadow-lg z-50">
+        <ul class="flex flex-col" style="list-style: none; padding: 0; margin: 0;">
+            <li class="border-b border-gray-200"><a href="/cart" class="block py-2 px-4"
+                    style="text-decoration: none; color: inherit;">Cart</a></li>
+            <li class="border-b border-gray-200"><a href="/favorites" class="block py-2 px-4"
+                    style="text-decoration: none; color: inherit;">Favorites</a></li>
+            <li class="border-b border-gray-200"><a href="/" class="block py-2 px-4"
+                    style="text-decoration: none; color: inherit;">Home</a></li>
+            <li class="border-b border-gray-200"><a href="/woman" class="block py-2 px-4"
+                    style="text-decoration: none; color: inherit;">Woman</a></li>
+            <li class="border-b border-gray-200"><a href="/man" class="block py-2 px-4"
+                    style="text-decoration: none; color: inherit;">Man</a></li>
+            <li class="border-b border-gray-200"><a href="/kids" class="block py-2 px-4"
+                    style="text-decoration: none; color: inherit;">Kids</a></li>
+            <li class="border-b border-gray-200"><a href="/sports" class="block py-2 px-4"
+                    style="text-decoration: none; color: inherit;">Sports</a></li>
+            <li class="border-b border-gray-200"><a href="/sale" class="block py-2 px-4"
+                    style="text-decoration: none; color: inherit;">Sale</a></li>
+        </ul>
+    </div>
+</nav>

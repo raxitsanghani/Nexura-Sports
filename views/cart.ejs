@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('partials/head') %>
+</head>
+
+<body class="bg-gray-50">
+    <%- include('partials/header') %>
+        <div class="mt-24 container mx-auto px-4 py-8 max-w-4xl">
+            <h1 class="text-3xl font-bold mb-8">My Cart</h1>
+            <div id="cart-items" class="flex flex-col gap-4 min-h-[200px]">
+                <p class="text-center text-gray-500">Loading cart...</p>
+            </div>
+            <div id="cart-summary" class="mt-8 border-t pt-4 flex flex-col items-end hidden">
+                <div class="flex justify-between w-full max-w-sm text-xl font-bold">
+                    <span>Total:</span>
+                    <span>$<span id="cart-total">0.00</span></span>
+                </div>
+                <a href="/checkout"
+                    class="bg-gray-900 text-white px-8 py-3 rounded-xl mt-4 hover:bg-black font-semibold text-center w-full max-w-xs block"
+                    style="text-decoration: none;">Proceed to Checkout</a>
+            </div>
+        </div>
+        <%- include('partials/footer') %>
+</body>
+
+</html>

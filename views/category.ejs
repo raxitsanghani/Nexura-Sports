@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('partials/head') %>
+        <script>
+            window.currentCategory = "<%= category %>";
+        </script>
+</head>
+
+<body class="bg-gray-50">
+    <%- include('partials/header') %>
+        <div class="mt-24">
+            <section class="bg-gray-50 py-8 antialiased mt-10 md:py-12">
+                <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
+                    <div class="mb-4 items-end justify-between space-y-4 sm:flex sm:space-y-0 md:mb-8">
+                        <h2 class="mt-3 text-xl font-semibold text-gray-900 sm:text-2xl">
+                            <%= category %> Collection
+                        </h2>
+                    </div>
+                    <div id="products-grid"
+                        class="mb-4 grid gap-4 grid-cols-1 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 xl:grid-cols-4">
+                        <div class="w-full flex justify-center col-span-full">
+                            <p>Loading products...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <%- include('partials/footer') %>
+</body>
+
+</html>

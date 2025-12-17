@@ -1,0 +1,376 @@
+/* Font Families */
+@font-face {
+  font-family: 'Satoshi';
+  src: url('path-to-your-font/Satoshi.woff2') format('woff2');
+}
+
+/* Background Colors */
+.bg-current {
+  background-color: currentColor;
+}
+
+.bg-transparent {
+  background-color: transparent;
+}
+
+.bg-white {
+  background-color: #FFFFFF;
+}
+
+.bg-black {
+  background-color: #1C2434;
+}
+
+.bg-black-2 {
+  background-color: #010101;
+}
+
+.bg-body {
+  background-color: #64748B;
+}
+
+.bg-bodydark {
+  background-color: #AEB7C0;
+}
+
+.bg-bodydark1 {
+  background-color: #DEE4EE;
+}
+
+.bg-bodydark2 {
+  background-color: #8A99AF;
+}
+
+.bg-primary-100 {
+  background-color: #E5E8FF;
+}
+
+.bg-primary-200 {
+  background-color: #C1C7FF;
+}
+
+.bg-primary-300 {
+  background-color: #A1A6FF;
+}
+
+.bg-primary-400 {
+  background-color: #7F85FF;
+}
+
+.bg-primary-500 {
+  background-color: #3C50E0;
+}
+
+.bg-primary-600 {
+  background-color: #2B3EAB;
+}
+
+.bg-primary-700 {
+  background-color: #1C2D7A;
+}
+
+.bg-primary-800 {
+  background-color: #0F1C55;
+}
+
+.bg-primary-900 {
+  background-color: #0A123D;
+}
+
+.bg-secondary-100 {
+  background-color: #D1E7F5;
+}
+
+.bg-secondary-200 {
+  background-color: #A4D6E9;
+}
+
+.bg-secondary-300 {
+  background-color: #7BB6DD;
+}
+
+.bg-secondary-400 {
+  background-color: #56A4D1;
+}
+
+.bg-secondary-500 {
+  background-color: #80CAEE;
+}
+
+.bg-secondary-600 {
+  background-color: #00A0D8;
+}
+
+.bg-secondary-700 {
+  background-color: #007DAF;
+}
+
+.bg-secondary-800 {
+  background-color: #005D89;
+}
+
+.bg-secondary-900 {
+  background-color: #003D5D;
+}
+
+.bg-stroke {
+  background-color: #E2E8F0;
+}
+
+
+
+.bg-whiten {
+  background-color: #F1F5F9;
+}
+
+.bg-whiter {
+  background-color: #F5F7FD;
+}
+
+.bg-boxdark {
+  background-color: #24303F;
+}
+
+.bg-boxdark-2 {
+  background-color: #1A222C;
+}
+
+.bg-strokedark {
+  background-color: #2E3A47;
+}
+
+.bg-form-strokedark {
+  background-color: #3D4D60;
+}
+
+.bg-form-input {
+  background-color: #1D2A39;
+}
+
+.bg-meta-1 {
+  background-color: #DC3545;
+}
+
+.bg-meta-2 {
+  background-color: #EFF2F7;
+}
+
+.bg-meta-3 {
+  background-color: #10B981;
+}
+
+.bg-meta-4 {
+  background-color: #313D4A;
+}
+
+.bg-meta-5 {
+  background-color: #259AE6;
+}
+
+.bg-meta-6 {
+  background-color: #FFBA00;
+}
+
+.bg-meta-7 {
+  background-color: #FF6766;
+}
+
+.bg-meta-8 {
+  background-color: #F0950C;
+}
+
+.bg-meta-9 {
+  background-color: #E5E7EB;
+}
+
+.bg-success {
+  background-color: #219653;
+}
+
+.bg-danger {
+  background-color: #D34053;
+}
+
+.bg-warning {
+  background-color: #FFA70B;
+}
+
+
+/* Text Colors */
+.text-current {
+  color: currentColor;
+}
+
+.text-transparent {
+  color: transparent;
+}
+
+
+.text-body {
+  color: #64748B;
+}
+
+.text-bodydark {
+  color: #AEB7C0;
+}
+
+.text-bodydark1 {
+  color: #DEE4EE;
+}
+
+.text-bodydark2 {
+  color: #8A99AF;
+}
+
+.text-primary-100 {
+  color: #E5E8FF;
+}
+
+.text-primary-200 {
+  color: #C1C7FF;
+}
+
+.text-primary-300 {
+  color: #A1A6FF;
+}
+
+.text-primary-400 {
+  color: #7F85FF;
+}
+
+.text-primary-500 {
+  color: #3C50E0;
+}
+
+.text-primary-600 {
+  color: #2B3EAB;
+}
+
+.text-primary-700 {
+  color: #1C2D7A;
+}
+
+.text-primary-800 {
+  color: #0F1C55;
+}
+
+.text-primary-900 {
+  color: #0A123D;
+}
+
+.text-secondary-100 {
+  color: #D1E7F5;
+}
+
+.text-secondary-200 {
+  color: #A4D6E9;
+}
+
+.text-secondary-300 {
+  color: #7BB6DD;
+}
+
+.text-secondary-400 {
+  color: #56A4D1;
+}
+
+.text-secondary-500 {
+  color: #80CAEE;
+}
+
+.text-secondary-600 {
+  color: #00A0D8;
+}
+
+.text-secondary-700 {
+  color: #007DAF;
+}
+
+.text-secondary-800 {
+  color: #005D89;
+}
+
+.text-secondary-900 {
+  color: #003D5D;
+}
+
+.text-stroke {
+  color: #E2E8F0;
+}
+
+
+.text-whiten {
+  color: #F1F5F9;
+}
+
+.text-whiter {
+  color: #F5F7FD;
+}
+
+.text-boxdark {
+  color: #24303F;
+}
+
+.text-boxdark-2 {
+  color: #1A222C;
+}
+
+.text-strokedark {
+  color: #2E3A47;
+}
+
+.text-form-strokedark {
+  color: #3D4D60;
+}
+
+.text-form-input {
+  color: #1D2A39;
+}
+
+.text-meta-1 {
+  color: #DC3545;
+}
+
+.text-meta-2 {
+  color: #EFF2F7;
+}
+
+.text-meta-3 {
+  color: #10B981;
+}
+
+.text-meta-4 {
+  color: #313D4A;
+}
+
+.text-meta-5 {
+  color: #259AE6;
+}
+
+.text-meta-6 {
+  color: #FFBA00;
+}
+
+.text-meta-7 {
+  color: #FF6766;
+}
+
+.text-meta-8 {
+  color: #F0950C;
+}
+
+.text-meta-9 {
+  color: #E5E7EB;
+}
+
+.text-success {
+  color: #219653;
+}
+
+.text-danger {
+  color: #D34053;
+}
+
+.text-warning {
+  color: #FFA70B;
+}

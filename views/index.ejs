@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('partials/head') %>
+</head>
+
+<body class="bg-gray-50">
+    <%- include('partials/header') %>
+
+        <div class="mt-24">
+            <!-- Home Featured Section -->
+            <section class="bg-white py-8 antialiased md:py-16">
+                <div class="mx-auto grid max-w-screen-xl px-4 pb-8 md:grid-cols-12 gap-8 lg:gap-12 lg:pb-16 xl:gap-0"
+                    style="display: grid; grid-template-columns: repeat(12, 1fr);">
+                    <div class="content-center justify-self-start md:col-span-7 md:ml-5 md:text-start"
+                        style="grid-column: span 12; @media (min-width: 768px) { grid-column: span 7; }">
+                        <h1 class="mb-4 text-4xl font-bold leading-none tracking-tight font-sans md:max-w-2xl md:text-6xl xl:text-8xl"
+                            style="font-size: 2.5rem; line-height: 1;">
+                            Best In Style
+                            <br />
+                            Collection <br />
+                            For You
+                        </h1>
+                        <hr class="bg-cs_yellow h-[3px] mx-auto my-4 rounded"
+                            style="background-color: #FFD700; height: 3px; border: none; width: 50%; margin-left: 0;">
+                        <p class="mb-4 max-w-2xl text-gray-500 md:mb-12 md:text-lg lg:mb-5 lg:text-xl">
+                            We craft the, we wont say the best,
+                            <br />
+                            But through 70 years of experience in the industry
+                        </p>
+                        <a href="#product_list"
+                            class="inline-block rounded-lg bg-gray-900 px-6 py-3.5 text-center font-medium text-white hover:bg-black focus:outline-none"
+                            style="background-color: #111; color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px;">
+                            Shop Now!
+                        </a>
+                    </div>
+                    <div class="hidden md:col-span-5 md:mt-0 md:flex items-center justify-center"
+                        style="grid-column: span 5; display: none; @media (min-width: 768px) { display: flex; }">
+                        <img class="relative xl:max-w-[43rem] xl:h-[43rem] lg:max-w-[30rem] lg:h-[30rem] top-5 pr-5"
+                            src="/images/logo-home.png" alt="shopping illustration"
+                            style="max-width: 100%; height: auto;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Product List Section -->
+            <section id="product_list" class="bg-gray-50 py-8 antialiased mt-10 md:py-12">
+                <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
+                    <div class="mb-4 items-end justify-between space-y-4 sm:flex sm:space-y-0 md:mb-8">
+                        <h2 class="mt-3 text-xl font-semibold text-gray-900 sm:text-2xl">
+                            Products
+                        </h2>
+                    </div>
+
+                    <!-- Products Grid -->
+                    <div id="products-grid"
+                        class="mb-4 grid gap-4 grid-cols-1 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 xl:grid-cols-4"
+                        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem;">
+                        <!-- JS will inject product cards here -->
+                        <div class="w-full flex justify-center col-span-full">
+                            <p>Loading products...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <%- include('partials/footer') %>
+</body>
+
+</html>

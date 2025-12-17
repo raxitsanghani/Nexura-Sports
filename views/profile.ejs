@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('partials/head') %>
+</head>
+
+<body class="bg-gray-50">
+    <%- include('partials/header') %>
+        <div class="mt-24 container mx-auto px-4 py-8 max-w-4xl">
+            <h1 class="text-3xl font-bold mb-8">My Profile</h1>
+            <div id="profile-content"
+                class="bg-white p-6 rounded-lg shadow-md border border-gray-200 flex flex-col items-center">
+                <img id="profile-pic" src="https://via.placeholder.com/150"
+                    class="w-24 h-24 rounded-full object-cover mb-4">
+                <h2 id="profile-name" class="text-2xl font-semibold mb-2">Loading...</h2>
+                <p id="profile-email" class="text-gray-600 mb-6">...</p>
+
+                <button id="logout-btn"
+                    class="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600">Logout</button>
+            </div>
+        </div>
+        <%- include('partials/footer') %>
+            <script type="module">
+                import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+                import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+                // This repeats some main.js logic but specific to this page population
+                const auth = getAuth();
+                const db = getFirestore();
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        document.getElementById('profile-email').innerText = user.email;
+                        document.getElementById('profile-name').innerText = user.displayName || 'User';
+                        if (user.photoURL) document.getElementById('profile-pic').src = user.photoURL;
+
+                        // Fetch extra data
+                        try {
+                            const docSnap = await getDoc(doc(db, "users", user.uid));
+                            if (docSnap.exists()) {
+                                const data = docSnap.data();
+                                if (data.name) document.getElementById('profile-name').innerText = data.name;
+                                if (data.profilePic) document.getElementById('profile-pic').src = data.profilePic;
+                            }
+                        } catch (e) { console.error(e); }
+
+                    } else {
+                        window.location.href = '/login';
+                    }
+                });
+
+                document.getElementById('logout-btn').addEventListener('click', () => {
+                    signOut(auth).then(() => {
+                        window.location.href = '/';
+                    });
+                });
+            </script>
+</body>
+
+</html>

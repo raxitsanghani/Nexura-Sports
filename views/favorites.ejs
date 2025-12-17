@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('partials/head') %>
+        <script>
+            window.isFavoritesPage = true;
+        </script>
+</head>
+
+<body class="bg-gray-50">
+    <%- include('partials/header') %>
+        <div class="mt-24 container mx-auto px-4 py-8">
+            <h1 class="text-3xl font-bold mb-8">My Favorites</h1>
+            <div id="products-grid"
+                class="mb-4 grid gap-4 grid-cols-1 sm:grid-cols-2 md:mb-8 lg:grid-cols-3 xl:grid-cols-4">
+                <div class="w-full flex justify-center col-span-full">
+                    <p>Loading favorites...</p>
+                </div>
+            </div>
+        </div>
+        <%- include('partials/footer') %>
+</body>
+
+</html>
