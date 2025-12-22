@@ -108,7 +108,7 @@ const AddProduct = () => {
     setLoading(true);
 
     try {
-      const categoriesArray = categories.split(",").map((item) => item.trim()).filter(item => item !== "");
+      const categoriesArray = categories.split(",").map((item) => item.trim().toLowerCase()).filter(item => item !== "");
       const featuresArray = features.split(",").map((item) => item.trim()).filter(item => item !== "");
       const sizesArray = sizes.split(",").map((item) => item.trim()).filter(item => item !== "");
 
@@ -118,9 +118,11 @@ const AddProduct = () => {
       // Upload default images
       if (defaultImageFiles.length > 0) {
         const defaultUploadPromises = defaultImageFiles.map(async (file, index) => {
+          const sanitizedName = name.replace(/\s+/g, "_");
+          const sanitizedFileName = file.name.replace(/\s+/g, "_");
           const defaultImageRef = ref(
             storage,
-            `shoes/${name}/default/${index}_${file.name}`
+            `shoes/${sanitizedName}/default/${index}_${sanitizedFileName}`
           );
           await uploadBytes(defaultImageRef, file);
           return getDownloadURL(defaultImageRef);
@@ -134,7 +136,10 @@ const AddProduct = () => {
       await Promise.all(colors.map(async (color) => {
         if (imageFiles[color] && imageFiles[color].length > 0) {
           const uploadPromises = imageFiles[color].map(async (file) => {
-            const imageRef = ref(storage, `shoes/${name}/${color}/${file.name}`);
+            const sanitizedName = name.replace(/\s+/g, "_");
+            const sanitizedColor = color.replace(/\s+/g, "_");
+            const sanitizedFileName = file.name.replace(/\s+/g, "_");
+            const imageRef = ref(storage, `shoes/${sanitizedName}/${sanitizedColor}/${sanitizedFileName}`);
             await uploadBytes(imageRef, file);
             return getDownloadURL(imageRef);
           });
@@ -143,6 +148,16 @@ const AddProduct = () => {
           imageUrlsArray[color] = [];
         }
       }));
+
+      // Fallback: If no default image set, use the first available color image
+      if (!primaryDefaultImageUrl) {
+        for (const color of colors) {
+          if (imageUrlsArray[color] && imageUrlsArray[color].length > 0) {
+            primaryDefaultImageUrl = imageUrlsArray[color][0];
+            break;
+          }
+        }
+      }
 
       await addDoc(collection(db, "products"), {
         name,
@@ -158,6 +173,7 @@ const AddProduct = () => {
         details: details,
         rating: {}, // Initialize with empty rating
         reviews: [], // Initialize with empty reviews
+        createdAt: new Date().toISOString(),
       });
 
       toast({

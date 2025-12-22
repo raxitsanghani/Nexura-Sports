@@ -91,7 +91,7 @@ const EditProduct: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const categoriesArray = categories.split(",").map((item) => item.trim()).filter(item => item !== "");
+    const categoriesArray = categories.split(",").map((item) => item.trim().toLowerCase()).filter(item => item !== "");
     const featuresArray = features.split(",").map((item) => item.trim()).filter(item => item !== "");
     const sizesArray = sizes.split(",").map((item) => item.trim()).filter(item => item !== "");
 
@@ -100,9 +100,11 @@ const EditProduct: React.FC = () => {
 
     // Upload default image if changed
     if (defaultImage) {
+      const sanitizedName = name.replace(/\s+/g, "_");
+      const sanitizedFileName = defaultImage.name.replace(/\s+/g, "_");
       const defaultImageRef = ref(
         storage,
-        `shoes/${name}/default/${defaultImage.name}`
+        `shoes/${sanitizedName}/default/${sanitizedFileName}`
       );
       await uploadBytes(defaultImageRef, defaultImage);
       newDefaultImageUrl = await getDownloadURL(defaultImageRef);
@@ -113,7 +115,10 @@ const EditProduct: React.FC = () => {
       if (imageFiles[color]) {
         newImageUrls[color] = newImageUrls[color] || [];
         for (let file of imageFiles[color]) {
-          const imageRef = ref(storage, `shoes/${name}/${color}/${file.name}`);
+          const sanitizedName = name.replace(/\s+/g, "_");
+          const sanitizedColor = color.replace(/\s+/g, "_");
+          const sanitizedFileName = file.name.replace(/\s+/g, "_");
+          const imageRef = ref(storage, `shoes/${sanitizedName}/${sanitizedColor}/${sanitizedFileName}`);
           await uploadBytes(imageRef, file);
           const downloadURL = await getDownloadURL(imageRef);
           newImageUrls[color].push(downloadURL);

@@ -12,7 +12,7 @@ const ProductImage = ({ selectedColor, product }: ProductImageProps) => {
   const [mainImage, setMainImage] = useState<string | undefined>(
     selectedColor
       ? product.imageUrls?.[selectedColor]?.[0]
-      : product.defaultImage
+      : product.defaultImage || Object.values(product.imageUrls || {})[0]?.[0]
   );
   const [showAllImages, setShowAllImages] = useState(false);
 
@@ -20,7 +20,7 @@ const ProductImage = ({ selectedColor, product }: ProductImageProps) => {
     if (selectedColor && product.imageUrls?.[selectedColor]) {
       setMainImage(product.imageUrls[selectedColor][0]);
     } else {
-      setMainImage(product.defaultImage);
+      setMainImage(product.defaultImage || Object.values(product.imageUrls || {})[0]?.[0]);
     }
   }, [selectedColor, product.imageUrls, product.defaultImage]);
 
@@ -43,7 +43,7 @@ const ProductImage = ({ selectedColor, product }: ProductImageProps) => {
     <div className="h-full lg:w-[50%] float-start lg:flex-row flex py-11 flex-col justify-center items-center gap-2 lg:justify-center">
       <div className="lg:h-[33.4rem] md:h-[34rem] w-full flex align-middle justify-center bg-gray-50 rounded-lg">
         <img
-          src={mainImage || product.defaultImage}
+          src={mainImage || product.defaultImage || Object.values(product.imageUrls || {})[0]?.[0]}
           alt="Main Display"
           className="h-full w-full rounded-lg object-contain mix-blend-multiply cursor-zoom-in"
         />
