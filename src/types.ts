@@ -25,4 +25,5 @@ export interface Product {
     imageUrls: Record<string, string[]>;
     isFavorite?: boolean;
     details?: string;
+    createdAt?: string;
 }

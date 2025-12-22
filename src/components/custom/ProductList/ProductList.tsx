@@ -38,8 +38,9 @@ const ProductList: React.FC<ProductListProps> = ({ selectedCategory }) => {
         }))
         .filter((product) => {
           if (selectedCategory && selectedCategory.toLowerCase() === 'sale') {
-            // Filter products that have a discount
-            return product.discount && product.discount.trim() !== "";
+            // Filter products that have a non-zero discount
+            const d = product.discount ? product.discount.trim() : "";
+            return d !== "" && d !== "0" && d !== "0%";
           }
           return selectedCategory
             ? product.categories
