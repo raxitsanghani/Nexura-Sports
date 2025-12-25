@@ -1,5 +1,34 @@
 import Images from "@/assets";
+import Bg from "@/assets/BG.png";
+import { useEffect, useRef } from "react"
+import "./index.css";
+
 const HomeFeatured = () => {
+  const modelRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    const model = modelRef.current as any
+    if (!model) return
+
+    model.autoRotate = false
+
+    const startAfterDelay = setTimeout(() => {
+      model.autoRotate = true
+    }, 1000)
+
+    const stopRotate = () => (model.autoRotate = false)
+    const startRotate = () => (model.autoRotate = true)
+
+    model.addEventListener("mouseenter", stopRotate)
+    model.addEventListener("mouseleave", startRotate)
+
+    return () => {
+      clearTimeout(startAfterDelay)
+      model.removeEventListener("mouseenter", stopRotate)
+      model.removeEventListener("mouseleave", startRotate)
+    }
+  }, [])
+
   return (
     <section className="bg-white py-8  antialiased  md:py-16 ">
       <div className="mx-auto grid max-w-screen-xl  px-4 pb-8 md:grid-cols-12 lg:gap-12 lg:pb-16 xl:gap-0 ">
@@ -23,13 +52,41 @@ const HomeFeatured = () => {
             Shop Now!
           </a>
         </div>
-        <div className="hidden md:col-span-5  md:mt-0 md:flex ">
-          <img
-            className="relative xl:max-w-[43rem] xl:h-[43rem] lg:max-w-[30rem] lg:h-[30rem]  top-5 lg:right-14  md:right-0 pr-5"
-            src={Images.logo_home}
-            alt="shopping illustration"
-          />
+        <div className="md:col-span-5 md:mt-0 md:flex relative justify-center items-center z-10">
+          <div className="relative w-full flex items-center justify-center group ">
+
+            {/* Background Image */}
+            {/* <img
+              src={Images.bg}
+              className="absolute inset-0 w-full h-full object-contain scale-110 transition-transform duration-700 group-hover:scale-110"
+              alt="Background"
+            />
+
+            {/* Shoe Image */}
+            {/* <img
+              src={Images.shoe}
+              className="relative z-10 w-[73%] object-cover translate-x-[-3%] translate-y-[-4%] scale-125 
+             drop-shadow-[0_40px_60px_rgba(0,0,0,0.35)]
+             transition-transform duration-500 ease-in-out
+             group-hover:scale-150 group-hover:-rotate-6"
+              alt="Shoe"
+            /> */}
+            <model-viewer
+              ref={modelRef}
+              src="/src/assets/nike/source/model.glb"
+              auto-rotate
+              camera-controls
+              disable-zoom
+              disable-pan
+              shadow-intensity="1"
+              shadow-softness="1"
+              exposure="1"
+              scale="1.6 1.6 1.6"
+              class="w-full h-[600px] md:h-[700px] rotate-slow"
+            />
+          </div>
         </div>
+
       </div>
     </section>
   );
