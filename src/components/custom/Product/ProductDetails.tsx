@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { findMatchingKey } from "@/utils/productUtils";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -158,41 +159,48 @@ const ProductDetails = ({
             {selectedColor || product.defaultColorName || "Select Color"}
           </span>
         </div>
-        <div className="flex gap-3 mt-2">
+        <div className="mt-2 grid grid-cols-6 gap-3">
           {/* Default/Original Color Option */}
           {product.defaultImage && (
-            <img
-              src={product.defaultImage}
-              key="default"
-              onClick={() => {
-                setSelectedColor(null);
-                handleColorChange("");
-              }}
-              className={`w-14 rounded-xl cursor-pointer border-2 ${selectedColor === null || selectedColor === ""
-                ? "border-primary-700"
-                : "border-transparent"
-                } hover:border-primary-700`}
-              alt="Default Color"
-              title="Default"
-            />
+            <div className="aspect-square">
+              <img
+                src={product.defaultImage}
+                key="default"
+                onClick={() => {
+                  setSelectedColor(null);
+                  handleColorChange("");
+                }}
+                className={`w-full h-full object-contain p-1 rounded-xl cursor-pointer border-2 ${selectedColor === null || selectedColor === ""
+                  ? "border-primary-700"
+                  : "border-transparent"
+                  } hover:border-primary-700`}
+                alt="Default Color"
+                title="Default"
+              />
+            </div>
           )}
 
           {/* @ts-ignore */}
-          {product.colors?.map((color) => (
-            <img
-              src={
-                product.imageUrls?.[color]?.[0] ||
-                Image.white
-              }
-              key={color}
-              onClick={() => handleColorClick(color)}
-              className={`w-14 rounded-xl cursor-pointer border-2 ${color === selectedColor
-                ? "border-primary-700"
-                : "border-transparent"
-                } hover:border-primary-700`}
-              alt={color}
-            />
-          ))}
+          {product.colors?.map((color) => {
+            const matchedKey = findMatchingKey(product.imageUrls, color);
+            const imageUrl = matchedKey ? product.imageUrls?.[matchedKey]?.[0] : null;
+            return (
+              <div key={color} className="aspect-square">
+                <img
+                  src={
+                    imageUrl ||
+                    Image.white
+                  }
+                  onClick={() => handleColorClick(color)}
+                  className={`w-full h-full object-contain p-1 rounded-xl cursor-pointer border-2 ${color === selectedColor
+                    ? "border-primary-700"
+                    : "border-transparent"
+                    } hover:border-primary-700`}
+                  alt={color}
+                />
+              </div>
+            )
+          })}
         </div>
       </div>
 

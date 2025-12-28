@@ -1,38 +1,71 @@
-import Images from "@/assets";
-import Bg from "@/assets/BG.png";
-import { useEffect, useRef } from "react"
+import { motion } from "framer-motion"
+import { useEffect, useRef, useState } from "react"
 import "./index.css";
+import VideoBackground from '../videobg/VideoBackground.tsx';
 
 const HomeFeatured = () => {
   const modelRef = useRef<HTMLElement | null>(null)
+  const defaultOrbit = useRef<string>("")
+  const interactionTimeout = useRef<any>(null)
+  const [modelLoaded, setModelLoaded] = useState(false)
+
 
   useEffect(() => {
     const model = modelRef.current as any
     if (!model) return
 
-    model.autoRotate = false
+    // 🔹 Store base camera position
+    if (!defaultOrbit.current) {
+      defaultOrbit.current = model.cameraOrbit || "0deg 75deg 105%"
+    }
 
-    const startAfterDelay = setTimeout(() => {
-      model.autoRotate = true
-    }, 1000)
+    // 🔹 Faster auto-rotation definition
+    // Note: model-viewer uses 'rotationPerSecond' string attribute/property.
+    model.rotationPerSecond = "60deg/s"
 
-    const stopRotate = () => (model.autoRotate = false)
-    const startRotate = () => (model.autoRotate = true)
+    // 🔹 Start auto-rotate
+    model.autoRotate = true
 
-    model.addEventListener("mouseenter", stopRotate)
-    model.addEventListener("mouseleave", startRotate)
+    
+    const onLoad = () => {
+      setModelLoaded(true) // ✅ model is ready, allow animation
+    }
+
+    model.addEventListener("load", onLoad)
+
+
+    // 🔹 When user rotates the model
+    const onCameraChange = (event: any) => {
+      // Only react to USER interaction, ignore auto-rotate changes
+      if (event.detail.source === 'user-interaction') {
+        model.autoRotate = false
+
+        if (interactionTimeout.current) {
+          clearTimeout(interactionTimeout.current)
+        }
+
+        interactionTimeout.current = setTimeout(() => {
+          model.cameraOrbit = defaultOrbit.current
+          model.autoRotate = true
+        }, 200)
+      }
+    }
+
+    model.addEventListener("camera-change", onCameraChange)
 
     return () => {
-      clearTimeout(startAfterDelay)
-      model.removeEventListener("mouseenter", stopRotate)
-      model.removeEventListener("mouseleave", startRotate)
+      clearTimeout(interactionTimeout.current)
+      model.removeEventListener("camera-change", onCameraChange)
+      model.removeEventListener("load", onLoad)
     }
   }, [])
 
+
   return (
-    <section className="bg-white py-8  antialiased  md:py-16 ">
-      <div className="mx-auto grid max-w-screen-xl  px-4 pb-8 md:grid-cols-12 lg:gap-12 lg:pb-16 xl:gap-0 ">
-        <div className="content-center justify-self-start md:col-span-7  md:ml-5   md:text-start">
+    <section className="relative pt-6 pb-10 antialiased md:pt-0 md:pb-10">
+      <VideoBackground />
+      <div className="relative backdrop-blur-[0px] mx-auto grid px-4 pb-16 md:grid-cols-12 lg:gap-12 lg:pb-16 xl:gap-0 ">
+        <div className="content-center justify-self-start md:col-span-7 md:ml-5 md:text-start">
           <h1 className="mb-4 text-4xl font-bold leading-none tracking-tight font-sans  md:max-w-2xl md:text-6xl xl:text-8xl">
             Best In Style
             <br />
@@ -43,7 +76,7 @@ const HomeFeatured = () => {
           <p className="mb-4 max-w-2xl text-gray-500  md:mb-12 md:text-lg  lg:mb-5 lg:text-xl">
             We craft the, we wont say the best,
             <br />
-            But through 70 years of experience in the industry
+            But through 15 years of experience in the industry
           </p>
           <a
             href="#product_list"
@@ -52,7 +85,13 @@ const HomeFeatured = () => {
             Shop Now!
           </a>
         </div>
-        <div className="md:col-span-5 md:mt-0 md:flex relative justify-center items-center z-10">
+        {/* <motion.div
+          initial={{ x: 30, opacity: 0 }}
+          animate={modelLoaded ? { x: 0, opacity: 1 } : {}}
+          transition={{ duration: 1, delay: 0.3 }}
+          className="md:col-span-5 md:mt-0 md:flex relative justify-center items-center z-10"
+        >
+
           <div className="relative w-full flex items-center justify-center group ">
 
             {/* Background Image */}
@@ -70,7 +109,7 @@ const HomeFeatured = () => {
              transition-transform duration-500 ease-in-out
              group-hover:scale-150 group-hover:-rotate-6"
               alt="Shoe"
-            /> */}
+            /> 
             <model-viewer
               ref={modelRef}
               src="/src/assets/nike/source/model.glb"
@@ -82,10 +121,11 @@ const HomeFeatured = () => {
               shadow-softness="1"
               exposure="1"
               scale="1.6 1.6 1.6"
-              class="w-full h-[600px] md:h-[700px] rotate-slow"
+              rotation-per-second="30deg/s"
+              class="w-full h-[600px] md:h-[700px]"
             />
           </div>
-        </div>
+        </motion.div> */}
 
       </div>
     </section>

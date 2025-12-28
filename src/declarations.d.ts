@@ -16,3 +16,5 @@ declare namespace JSX {
         };
     }
 }
+
+declare module '*.mp4';

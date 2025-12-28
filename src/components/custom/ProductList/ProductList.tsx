@@ -95,7 +95,7 @@ const ProductList: React.FC<ProductListProps> = ({ selectedCategory }) => {
 
   if (productsStatus === "loading")
     return (
-      <div className="w-screen flex items-center justify-center h-screen -mt-24">
+      <div className="w-screen flex items-center justify-center h-screen -mt-14">
         <ReactLoading type={"bars"} height={30} width={30} color="black" />
       </div>
     );
@@ -103,7 +103,7 @@ const ProductList: React.FC<ProductListProps> = ({ selectedCategory }) => {
   if (filteredProducts.length === 0) return <div>No products available.</div>;
 
   return (
-    <section id="product_list" className="bg-white py-8 antialiased dark:bg-gray-900 mt-0 md:py-12">
+    <section id="product_list" className="bg-white py-8 antialiased dark:bg-gray-900 mt-0 md:py-8">
       <div className="mx-auto max-w-[1440px] px-4">
 
         {/* Header / Breadcrumbs Style Title */}
@@ -119,7 +119,7 @@ const ProductList: React.FC<ProductListProps> = ({ selectedCategory }) => {
 
           {/* Grid */}
           <div className="flex-1">
-            <div className="grid gap-x-4 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4">
+            <div className="grid gap-x-4 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
               {filteredProducts.map((product) => (
                 <ProductCard
                   key={product.id}

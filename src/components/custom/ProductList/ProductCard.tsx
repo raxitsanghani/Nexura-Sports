@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Product } from "@/types";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 interface ProductCardProps {
     product: Product;
@@ -32,6 +32,22 @@ const ProductCard = ({ product, isFavorite, onToggleFavorite }: ProductCardProps
         ...explicitColors.filter(c => imageUrls[c] && imageUrls[c].length > 0),
         ...availableImageKeys
     ])).reverse();
+
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [showArrows, setShowArrows] = useState(false);
+
+    const checkScrollable = () => {
+        if (scrollContainerRef.current) {
+            const { scrollWidth, clientWidth } = scrollContainerRef.current;
+            setShowArrows(scrollWidth > clientWidth);
+        }
+    };
+
+    useEffect(() => {
+        checkScrollable();
+        window.addEventListener('resize', checkScrollable);
+        return () => window.removeEventListener('resize', checkScrollable);
+    }, [displayKeys]);
 
     return (
         <div className="relative group flex flex-col h-full bg-white transition-shadow">
@@ -66,25 +82,60 @@ const ProductCard = ({ product, isFavorite, onToggleFavorite }: ProductCardProps
             </Link>
 
             {/* Color Thumbnails */}
-            <div className="px-3 flex gap-1 mb-2 overflow-x-auto no-scrollbar h-10 items-center">
-                {displayKeys.map((color, index) => {
-                    const colorImg = imageUrls[color]?.[0];
-                    if (!colorImg) return null;
-                    return (
-                        <button
-                            key={`${color}-${index}`}
-                            onMouseEnter={() => setCurrentImage(colorImg)}
-                            onClick={(e) => {
-                                e.preventDefault();
-                                setCurrentImage(colorImg);
-                            }}
-                            className={`w-8 h-8 md:w-10 md:h-10 border rounded flex-shrink-0 overflow-hidden ${currentImage === colorImg ? 'border-black' : 'border-gray-200'}`}
-                            title={product.colors?.includes(color) ? color : `${color} (Unlisted)`}
-                        >
-                            <img src={colorImg} alt={color} className="w-full h-full object-cover" />
-                        </button>
-                    );
-                })}
+            <div className="relative group/colors px-3 mb-2">
+                {/* Left Arrow */}
+                {showArrows && (
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            if (scrollContainerRef.current) {
+                                scrollContainerRef.current.scrollBy({ left: -100, behavior: 'smooth' });
+                            }
+                        }}
+                        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white border border-gray-200 shadow-sm h-8 w-6 flex items-center justify-center rounded opacity-0 group-hover/colors:opacity-100 transition-opacity hover:bg-gray-50"
+                    >
+                        <FaChevronLeft className="w-3 h-3 text-gray-600" />
+                    </button>
+                )}
+
+                <div
+                    ref={scrollContainerRef}
+                    className="flex gap-1 overflow-x-auto no-scrollbar h-10 items-center scroll-smooth"
+                >
+                    {displayKeys.map((color, index) => {
+                        const colorImg = imageUrls[color]?.[0];
+                        if (!colorImg) return null;
+                        return (
+                            <button
+                                key={`${color}-${index}`}
+                                onMouseEnter={() => setCurrentImage(colorImg)}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    setCurrentImage(colorImg);
+                                }}
+                                className={`w-8 h-8 md:w-10 md:h-10 border rounded flex-shrink-0 overflow-hidden ${currentImage === colorImg ? 'border-black' : 'border-gray-200'}`}
+                                title={product.colors?.includes(color) ? color : `${color} (Unlisted)`}
+                            >
+                                <img src={colorImg} alt={color} className="w-full h-full object-cover" />
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* Right Arrow */}
+                {showArrows && (
+                    <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            if (scrollContainerRef.current) {
+                                scrollContainerRef.current.scrollBy({ left: 100, behavior: 'smooth' });
+                            }
+                        }}
+                        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white border border-gray-200 shadow-sm h-8 w-6 flex items-center justify-center rounded opacity-0 group-hover/colors:opacity-100 transition-opacity hover:bg-gray-50"
+                    >
+                        <FaChevronRight className="w-3 h-3 text-gray-600" />
+                    </button>
+                )}
             </div>
 
             {/* Product Details */}
