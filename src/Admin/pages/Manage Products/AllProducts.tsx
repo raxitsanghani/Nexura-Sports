@@ -24,7 +24,7 @@ const AllProducts = () => {
   };
 
   const fixCategories = async () => {
-    if (!confirm("This will assign 'man', 'woman', 'sports' categories to all products that currently have NO categories. Continue?")) return;
+    if (!confirm("This will analyze all products. If a product name contains 'Woman' or 'Women', it will ensure the 'Woman' category is assigned. It will also fix category casing (e.g., 'women' -> 'Woman'). Continue?")) return;
     setIsFixing(true);
     try {
       const productsCollection = collection(db, "products");
@@ -33,14 +33,43 @@ const AllProducts = () => {
 
       for (const d of snapshot.docs) {
         const data = d.data();
-        if (!data.categories || !Array.isArray(data.categories) || data.categories.length === 0) {
+        let categories: string[] = Array.isArray(data.categories) ? data.categories : [];
+        let updated = false;
+
+        // 1. Parse name for gender
+        const nameLower = (data.name || "").toLowerCase();
+        // Check for common variations in potential existing categories to preserve them or normalize them
+        const hasWoman = categories.some(c => c.toLowerCase().trim() === "woman" || c.toLowerCase().trim() === "women");
+
+        // If name suggests woman and no woman category is present, add it
+        if ((nameLower.includes("women") || nameLower.includes("woman") || nameLower.includes("ladies")) && !hasWoman) {
+          categories.push("Woman");
+          updated = true;
+        }
+
+        // 2. Normalize Casing and Trim
+        const normalizedCategories = categories.map(c => {
+          const trimmed = c.trim();
+          if (trimmed.toLowerCase() === "women") return "Woman";
+          if (trimmed.toLowerCase() === "woman") return "Woman";
+          if (trimmed.toLowerCase() === "men") return "Man";
+          if (trimmed.toLowerCase() === "man") return "Man";
+          // Default capitalize first letter for others
+          return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
+        });
+
+        // Dedup
+        const uniqueCategories = Array.from(new Set(normalizedCategories));
+
+        // Check if changed
+        if (updated || JSON.stringify(uniqueCategories) !== JSON.stringify(data.categories)) {
           await updateDoc(doc(db, "products", d.id), {
-            categories: ["man", "woman", "sports"]
+            categories: uniqueCategories
           });
           count++;
         }
       }
-      alert(`Fixed categories for ${count} products.`);
+      alert(`Successfully updated categories for ${count} products.`);
       fetchProducts();
     } catch (error) {
       console.error("Error fixing categories:", error);

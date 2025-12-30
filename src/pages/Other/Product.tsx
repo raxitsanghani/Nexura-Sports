@@ -8,6 +8,7 @@ import ProductImage from "@/components/custom/Product/ProductImage";
 import { useEffect, useState } from "react";
 import ReactLoading from "react-loading";
 import ProductReviews from "@/components/custom/Product/ProductReviews";
+import ProductRecommendations from "@/components/custom/Product/ProductRecommendations";
 
 const Product = () => {
   const { id } = useParams<{ id: string }>();
@@ -55,6 +56,7 @@ const Product = () => {
         <ProductDescription product={product} />
         {/* @ts-ignore */}
         <ProductReviews product={product} productId={id || ""} />
+        <ProductRecommendations currentProduct={product} />
       </div>
     </>
   );

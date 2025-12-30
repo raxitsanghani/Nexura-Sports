@@ -1,168 +1,214 @@
 import { useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
-import { fetchOrders } from "@/utils/fetchOrders"; // Adjust import if needed
-import { CgSandClock } from "react-icons/cg";
-import { FiTruck } from "react-icons/fi";
-import { IoCheckmarkSharp } from "react-icons/io5";
-import { RxCross2 } from "react-icons/rx";
-import { cancelOrder, removeOrder } from "@/utils/createOrderInFirebase";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  onSnapshot,
+  doc,
+  updateDoc
+} from "firebase/firestore";
+import { FiAlertCircle } from "react-icons/fi";
 import ReactLoading from "react-loading";
+import toast, { Toaster } from 'react-hot-toast';
 
 interface Order {
   orderId: string;
-  date: string;
-  time: string;
-  price: string;
+  // Support both legacy date object or Firestore Timestamp
+  timestamp?: any;
+  date?: string;
+  time?: string;
+  price: number;
   status: string;
-  products: Record<string, { quantity: number }>;
+  products: any[];
 }
 
 const OrdersList = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Cancellation Modal State
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const [submittingCancel, setSubmittingCancel] = useState(false);
+
   const auth = getAuth();
+  const db = getFirestore();
   const userId = auth.currentUser?.uid;
 
   useEffect(() => {
-    const loadOrders = async () => {
-      if (userId) {
-        try {
-          const ordersData = await fetchOrders(userId);
-          // @ts-ignore
-          setOrders(ordersData);
-        } catch (error) {
-          console.error("Error fetching orders: ", error);
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        console.error("User ID is undefined.");
-        setLoading(false);
-      }
-    };
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
 
-    loadOrders();
+    const q = query(collection(db, "orders"), where("userId", "==", userId));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedOrders = snapshot.docs.map(doc => {
+        const data = doc.data();
+        // Fallback for date display if timestamp exists
+        if (data.timestamp && !data.date) {
+          const d = data.timestamp.toDate();
+          data.date = d.toLocaleDateString();
+          data.time = d.toLocaleTimeString();
+        }
+        return data as Order;
+      });
+
+      // Sort by newest first (client-side to avoid index creation delay)
+      fetchedOrders.sort((a, b) => {
+        const timeA = a.timestamp?.seconds || 0;
+        const timeB = b.timestamp?.seconds || 0;
+        return timeB - timeA;
+      });
+
+      setOrders(fetchedOrders);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching orders:", error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, [userId]);
 
-  const handleCancel = async (orderId: string) => {
+  const openCancelModal = (orderId: string) => {
+    setSelectedOrderId(orderId);
+    setCancelReason("");
+    setIsCancelModalOpen(true);
+  };
+
+  const closeCancelModal = () => {
+    setIsCancelModalOpen(false);
+    setSelectedOrderId(null);
+  };
+
+  const submitCancellation = async () => {
+    if (!selectedOrderId || !cancelReason.trim()) {
+      toast.error("Please provide a reason.");
+      return;
+    }
+
+    setSubmittingCancel(true);
     try {
-      await cancelOrder(userId!, orderId);
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order.orderId === orderId ? { ...order, status: "Cancelled" } : order
-        )
-      );
+      await updateDoc(doc(db, "orders", selectedOrderId), {
+        status: "Cancellation Requested",
+        cancellationReason: cancelReason
+      });
+      toast.success("Cancellation requested successfully.");
+      closeCancelModal();
     } catch (error) {
-      console.error("Error handling cancel button click: ", error);
+      console.error("Error submitting cancellation:", error);
+      toast.error("Failed to request cancellation.");
+    } finally {
+      setSubmittingCancel(false);
     }
   };
 
-  const handleRemove = async (orderId: string) => {
-    try {
-      await removeOrder(userId!, orderId);
-      setOrders((prevOrders) =>
-        prevOrders.filter((order) => order.orderId !== orderId)
-      );
-    } catch (error) {
-      console.error("Error handling remove button click: ", error);
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Confirmed': return "bg-green-100 text-green-800";
+      case 'In transit': return "bg-yellow-100 text-yellow-800";
+      case 'Cancelled': return "bg-red-100 text-red-800";
+      case 'Cancellation Requested': return "bg-orange-100 text-orange-800";
+      default: return "bg-blue-100 text-blue-800";
     }
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 relative">
+      <Toaster />
+
+      {/* Cancellation Modal */}
+      {isCancelModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Request Cancellation</h3>
+              <p className="text-sm text-gray-500 mb-4">Please tell us why you want to cancel your order.</p>
+
+              <textarea
+                className="w-full border border-gray-300 rounded-md p-3 text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none resize-none h-32"
+                placeholder="Reason for cancellation..."
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+              />
+
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={closeCancelModal}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                >
+                  Keep Order
+                </button>
+                <button
+                  onClick={submitCancellation}
+                  disabled={submittingCancel || !cancelReason.trim()}
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors disabled:opacity-50"
+                >
+                  {submittingCancel ? 'Submitting...' : 'Request Cancellation'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {loading ? (
-        <div className="text-center text-lg font-semibold text-gray-600">
+        <div className="text-center text-lg font-semibold text-gray-600 flex justify-center py-20">
           <ReactLoading type={"bars"} height={30} width={30} color="black" />
         </div>
       ) : orders.length === 0 ? (
-        <div className="text-center text-lg font-semibold text-gray-600">
-          No orders found.
+        <div className="text-center py-20">
+          <p className="text-xl text-gray-500 mb-4">No orders found.</p>
         </div>
       ) : (
         <section className="bg-white rounded-lg shadow-lg">
           <div className="p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">My Orders</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-4">My Orders</h2>
             <div className="divide-y divide-gray-200">
               {orders.map((order) => (
                 <div
                   key={order.orderId}
                   className="relative flex flex-wrap items-center gap-y-4 py-6 border-b border-gray-200 last:border-b-0"
                 >
-                  {order.status === "Cancelled" && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemove(order.orderId)}
-                      className="absolute top-2 right-2 rounded-full bg-gray-200 p-2 text-gray-700 hover:bg-gray-300"
-                    >
-                      <RxCross2 />
-                    </button>
-                  )}
                   <div className="w-full sm:w-1/2 md:w-1/4">
-                    <h3 className="text-base font-medium text-gray-600">
-                      Order ID:
-                    </h3>
-                    <p className="mt-1 text-lg font-semibold text-gray-800">
-                      <a href="#" className="hover:underline">
-                        {order.orderId}
-                      </a>
-                    </p>
+                    <h3 className="text-xs font-medium text-gray-500 uppercase">Order ID</h3>
+                    <p className="mt-1 text-base font-bold text-gray-900">{order.orderId}</p>
                   </div>
                   <div className="w-full sm:w-1/2 md:w-1/4">
-                    <h3 className="text-base font-medium text-gray-600">
-                      Date:
-                    </h3>
-                    <p className="mt-1 text-lg font-semibold text-gray-800">
-                      {order.date}
-                    </p>
+                    <h3 className="text-xs font-medium text-gray-500 uppercase">Date</h3>
+                    <p className="mt-1 text-base font-medium text-gray-900">{order.date}</p>
                   </div>
                   <div className="w-full sm:w-1/2 md:w-1/4">
-                    <h3 className="text-base font-medium text-gray-600">
-                      Time:
-                    </h3>
-                    <p className="mt-1 text-lg font-semibold text-gray-800">
-                      {order.time}
-                    </p>
+                    <h3 className="text-xs font-medium text-gray-500 uppercase">Total</h3>
+                    <p className="mt-1 text-base font-medium text-gray-900">₹ {Number(order.price).toFixed(2)}</p>
                   </div>
                   <div className="w-full sm:w-1/2 md:w-1/4">
-                    <h3 className="text-base font-medium text-gray-600">
-                      Price:
-                    </h3>
-                    <p className="mt-1 text-lg font-semibold text-gray-800">
-                      ₹ {order.price}
-                    </p>
-                  </div>
-                  <div className="w-full sm:w-1/2 md:w-1/4">
-                    <h3 className="text-base font-medium text-gray-600">
-                      Status:
-                    </h3>
-                    <div
-                      className={`mt-1 inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${order.status === "Pre-order"
-                          ? "bg-blue-100 text-blue-800"
-                          : order.status === "In transit"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : order.status === "Confirmed"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                        }`}
-                    >
-                      {order.status === "Pre-order" && <CgSandClock />}
-                      {order.status === "In transit" && <FiTruck />}
-                      {order.status === "Confirmed" && <IoCheckmarkSharp />}
-                      {order.status !== "Confirmed" &&
-                        order.status !== "In transit" &&
-                        order.status !== "Pre-order" && <RxCross2 />}
+                    <h3 className="text-xs font-medium text-gray-500 uppercase">Status</h3>
+                    <div className={`mt-1 inline-flex items-center rounded-full px-3 py-1 text-xs font-bold ${getStatusColor(order.status)}`}>
                       {order.status}
                     </div>
                   </div>
-                  <div className="w-full flex space-x-4">
-                    {order.status !== "Cancelled" && (
+
+                  {/* Actions */}
+                  <div className="w-full flex justify-end mt-2">
+                    {order.status !== "Cancelled" && order.status !== "Cancellation Requested" && (
                       <button
                         type="button"
-                        onClick={() => handleCancel(order.orderId)}
-                        className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700"
+                        onClick={() => openCancelModal(order.orderId)}
+                        className="rounded bg-gray-100 px-4 py-2 text-xs font-bold text-gray-700 hover:bg-gray-200 hover:text-red-600 transition-colors uppercase tracking-wider"
                       >
-                        Cancel
+                        Cancel Order
                       </button>
+                    )}
+                    {order.status === "Cancellation Requested" && (
+                      <span className="text-xs text-orange-600 font-medium flex items-center gap-1">
+                        <FiAlertCircle /> Cancellation Pending
+                      </span>
                     )}
                   </div>
                 </div>

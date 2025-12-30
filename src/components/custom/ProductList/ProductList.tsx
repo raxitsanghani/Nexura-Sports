@@ -42,11 +42,17 @@ const ProductList: React.FC<ProductListProps> = ({ selectedCategory }) => {
             const d = product.discount ? product.discount.trim() : "";
             return d !== "" && d !== "0" && d !== "0%";
           }
-          return selectedCategory
-            ? product.categories
-              .map((c) => c.toLowerCase())
-              .includes(selectedCategory.toLowerCase())
-            : true;
+          if (selectedCategory) {
+            const normalizedCategory = selectedCategory.trim().toLowerCase();
+            return product.categories
+              .map((c) => c.trim().toLowerCase())
+              .some(c => {
+                if (normalizedCategory === 'woman' && (c === 'women' || c === 'woman')) return true;
+                if (normalizedCategory === 'man' && (c === 'men' || c === 'man')) return true;
+                return c === normalizedCategory;
+              });
+          }
+          return true;
         });
       setFilteredProducts(filtered.sort((a: any, b: any) => {
         const dateA = a.createdAt || "";
@@ -119,7 +125,7 @@ const ProductList: React.FC<ProductListProps> = ({ selectedCategory }) => {
 
           {/* Grid */}
           <div className="flex-1">
-            <div className="grid gap-x-4 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
               {filteredProducts.map((product) => (
                 <ProductCard
                   key={product.id}

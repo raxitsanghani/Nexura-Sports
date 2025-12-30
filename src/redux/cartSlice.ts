@@ -9,10 +9,12 @@ interface CartItem {
 
 interface CartState {
   items: Record<string, CartItem>;
+  isOpen: boolean;
 }
 
 const initialState: CartState = {
   items: {},
+  isOpen: false,
 };
 
 const cartSlice = createSlice({
@@ -38,6 +40,7 @@ const cartSlice = createSlice({
       } else {
         state.items[productId] = { productId, quantity, color, size };
       }
+      state.isOpen = true; // Open cart on add
     },
     removeFromCart(state, action: PayloadAction<string>) {
       delete state.items[action.payload];
@@ -56,6 +59,15 @@ const cartSlice = createSlice({
     clearCart(state) {
       state.items = {};
     },
+    toggleCart(state) {
+      state.isOpen = !state.isOpen;
+    },
+    openCart(state) {
+      state.isOpen = true;
+    },
+    closeCart(state) {
+      state.isOpen = false;
+    },
   },
 });
 
@@ -67,6 +79,6 @@ export const selectTotalCartItems = (state: { cart: CartState }): number => {
   );
 };
 
-export const { addToCart, removeFromCart, updateQuantity, clearCart } =
+export const { addToCart, removeFromCart, updateQuantity, clearCart, toggleCart, openCart, closeCart } =
   cartSlice.actions;
 export default cartSlice.reducer;

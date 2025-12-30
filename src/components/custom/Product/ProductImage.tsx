@@ -90,47 +90,54 @@ const ProductImage = ({ selectedColor, product }: ProductImageProps) => {
     : validImages.slice(0, 3);
 
   return (
-    <div className="h-full lg:w-[50%] float-start lg:flex-row flex py-11 flex-col justify-center items-center gap-2 lg:justify-center">
-      <div className="lg:h-[33.4rem] md:h-[34rem] w-full flex align-middle justify-center bg-gray-50 rounded-lg lg:order-2">
-        <img
-          src={mainImage || product.defaultImage || "https://placehold.co/600x400?text=No+Image"}
-          alt="Main Display"
-          className="h-full w-full rounded-lg object-contain mix-blend-multiply cursor-zoom-in"
-        />
-      </div>
-      <div className="flex flex-wrap lg:flex-col gap-2 md:-mt-[1px] mt-2 lg:order-1">
+    <div className="h-full lg:w-[60%] flex flex-col-reverse lg:flex-row gap-4 py-8 select-none">
+      {/* Thumbnails - Left on desktop, Bottom on mobile */}
+      <div className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-y-auto no-scrollbar py-2 lg:py-0 lg:h-[500px]">
         {validImages.length > 0 &&
           imagesToDisplay.map((imageUrl: string, index: number) => (
             <img
               key={index}
               src={imageUrl}
               alt={`Thumbnail ${index}`}
-              className={`lg:w-32 md:w-20 w-14 h-14 md:h-20 lg:h-32 rounded-lg cursor-pointer border-2 object-contain bg-white ${mainImage === imageUrl
-                ? "border-blue-500"
-                : "border-transparent"
+              className={`w-16 h-16 md:w-20 md:h-20 rounded-md cursor-pointer object-cover border-2 transition-all ${mainImage === imageUrl
+                ? "border-black ring-1 ring-black"
+                : "border-transparent hover:border-gray-300"
                 }`}
+              onMouseEnter={() => handleThumbnailClick(imageUrl)}
               onClick={() => handleThumbnailClick(imageUrl)}
             />
           ))}
+
         {/* View More Button */}
         {validImages.length > 3 && !showAllImages && (
           <button
-            className="lg:w-32 md:w-20 w-14 h-14 md:h-20 lg:h-32 rounded-lg cursor-pointer border-2 flex items-center justify-center bg-white hover:bg-gray-50 text-sm font-medium"
+            className="w-16 h-16 md:w-20 md:h-20 rounded-md cursor-pointer border border-gray-200 flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 text-[10px] uppercase font-bold text-gray-600 transition-colors shrink-0 leading-tight p-1 text-center"
             onClick={() => setShowAllImages(true)}
           >
-            View More
+            <span>View</span>
+            <span>More</span>
           </button>
         )}
 
         {/* View Less Button */}
         {validImages.length > 3 && showAllImages && (
           <button
-            className="lg:w-32 md:w-20 w-14 h-14 md:h-20 lg:h-32 rounded-lg cursor-pointer border-2 flex items-center justify-center bg-white hover:bg-gray-50 text-sm font-medium"
+            className="w-16 h-16 md:w-20 md:h-20 rounded-md cursor-pointer border border-gray-200 flex flex-col items-center justify-center bg-gray-50 hover:bg-gray-100 text-[10px] uppercase font-bold text-gray-600 transition-colors shrink-0 leading-tight p-1 text-center"
             onClick={() => setShowAllImages(false)}
           >
-            View Less
+            <span>View</span>
+            <span>Less</span>
           </button>
         )}
+      </div>
+
+      {/* Main Image */}
+      <div className="flex-1 bg-[#f7f7f7] rounded-xl flex items-center justify-center p-6 lg:h-[600px] relative overflow-hidden group">
+        <img
+          src={mainImage || product.defaultImage || "https://placehold.co/600x400?text=No+Image"}
+          alt="Main Display"
+          className="max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-110 cursor-zoom-in"
+        />
       </div>
     </div>
   );

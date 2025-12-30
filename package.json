@@ -35,6 +35,7 @@
     "flatpickr": "^4.6.13",
     "framer-motion": "^12.23.26",
     "jsvectormap": "^1.6.0",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.427.0",
     "motion": "^12.23.26",
     "npm": "^10.8.3",
