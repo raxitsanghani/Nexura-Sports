@@ -46,6 +46,11 @@ const ProductCard = ({ product, isFavorite, onToggleFavorite }: ProductCardProps
         return () => window.removeEventListener('resize', checkScrollable);
     }, [displayKeys]);
 
+    const originalPrice = Number(product.price);
+    const discountValue = parseFloat(product.discount || "0");
+    const hasDiscount = !isNaN(discountValue) && discountValue > 0;
+    const discountedPrice = hasDiscount ? originalPrice - (originalPrice * discountValue / 100) : originalPrice;
+
     return (
         <motion.div
             className="relative group flex flex-col h-full bg-white hover:shadow-xl transition-all duration-300 rounded-lg overflow-hidden border border-transparent hover:border-gray-100"
@@ -55,9 +60,9 @@ const ProductCard = ({ product, isFavorite, onToggleFavorite }: ProductCardProps
         >
             {/* Badge */}
             <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
-                {product.discount && (
+                {hasDiscount && (
                     <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded-sm">
-                        {product.discount.replace(/off/i, "").trim()} OFF
+                        {discountValue}% OFF
                     </span>
                 )}
             </div>
@@ -147,8 +152,15 @@ const ProductCard = ({ product, isFavorite, onToggleFavorite }: ProductCardProps
                             {product.name}
                         </h3>
                     </Link>
-                    <div className="mt-2 text-lg font-bold text-gray-900">
-                        ₹{Number(product.price).toLocaleString('en-IN')}
+                    <div className="mt-2 flex items-center gap-2">
+                        <span className="text-lg font-bold text-gray-900">
+                            ₹{discountedPrice.toLocaleString('en-IN', { maximumFractionDigits: 0 })}
+                        </span>
+                        {hasDiscount && (
+                            <span className="text-sm text-gray-500 line-through">
+                                ₹{originalPrice.toLocaleString('en-IN')}
+                            </span>
+                        )}
                     </div>
                 </div>
             </div>

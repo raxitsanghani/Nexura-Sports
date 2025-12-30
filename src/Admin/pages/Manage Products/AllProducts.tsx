@@ -108,7 +108,7 @@ const AllProducts = () => {
           {products.map((product) => (
             <tr key={product.id} className="hover:bg-gray-100">
               <td className="py-2 px-4 border">{product.name}</td>
-              <td className="py-2 px-4 border">${Number(product.price).toFixed(2)}</td>
+              <td className="py-2 px-4 border">₹{Number(product.price).toFixed(2)}</td>
               <td className="py-2 px-4 border">
                 <img
                   src={product.defaultImage || "default-image-url.jpg"}

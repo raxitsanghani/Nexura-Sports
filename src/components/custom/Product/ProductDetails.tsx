@@ -137,6 +137,12 @@ const ProductDetails = ({
       </div>
     );
 
+  // Discount Calculation
+  const originalPrice = Number(product.price);
+  const discountValue = parseFloat(product.discount || "0");
+  const hasDiscount = !isNaN(discountValue) && discountValue > 0;
+  const discountedPrice = hasDiscount ? originalPrice - (originalPrice * discountValue / 100) : originalPrice;
+
   return (
     <div className="md:px-8 py-8 md:ml-0 max-w-2xl">
       <Toaster position="top-center" reverseOrder={false} />
@@ -152,12 +158,19 @@ const ProductDetails = ({
           {product.name}
         </h1>
         <div className="flex items-center gap-4 mt-2">
-          <div className="text-2xl font-bold text-gray-900">
-            ₹{Number(product.price).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+          <div className="flex items-center gap-3">
+            <span className="text-2xl font-bold text-gray-900">
+              ₹{discountedPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+            </span>
+            {hasDiscount && (
+              <span className="text-lg text-gray-500 line-through">
+                ₹{originalPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+              </span>
+            )}
           </div>
-          {product.discount && (
+          {hasDiscount && (
             <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded uppercase">
-              {product.discount} OFF
+              {discountValue}% OFF
             </span>
           )}
         </div>
