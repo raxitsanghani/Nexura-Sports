@@ -10,7 +10,7 @@ export const findMatchingKey = (imageUrls: Record<string, any> | undefined, targ
     const match = keys.find(key => normalize(key) === target); // Loose match
 
     if (!match) {
-        console.warn(`[ProductUtils] No match found for color: "${targetColor}" (normalized: "${target}"). Available keys:`, keys);
+        // console.warn(`[ProductUtils] No match found for color: "${targetColor}" (normalized: "${target}"). Available keys:`, keys);
     }
 
     return match;

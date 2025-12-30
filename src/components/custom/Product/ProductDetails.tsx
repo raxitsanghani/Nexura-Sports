@@ -3,6 +3,7 @@ import { findMatchingKey } from "@/utils/productUtils";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import RatingProvider from "@/components/ui/Rating";
+import VerticalTable from "@/components/ui/VerticalTable";
 import { FaHeart, FaRegHeart, FaRulerHorizontal } from "react-icons/fa";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
 import { FiTruck, FiAlertCircle } from "react-icons/fi";
@@ -288,9 +289,17 @@ const ProductDetails = ({
       {/* Description Preview (Short) */}
       <div className="mt-8 pt-8 border-t border-gray-100">
         <h3 className="font-bold text-gray-900 mb-2">Description</h3>
-        <p className="text-sm text-gray-600 leading-relaxed line-clamp-4">
-          {product.description || "Experience premium comfort and performance with our latest collection. Designed for athletes and enthusiasts alike."}
-        </p>
+        {typeof product.description === 'string' ? (
+          <p className="text-sm text-gray-600 leading-relaxed line-clamp-4">
+            {product.description || "Experience premium comfort and performance with our latest collection. Designed for athletes and enthusiasts alike."}
+          </p>
+        ) : (
+          // @ts-ignore
+          <div className="text-sm text-gray-600">
+            {/* @ts-ignore */}
+            <VerticalTable product={{ description: product.description || {} }} />
+          </div>
+        )}
       </div>
     </div>
   );

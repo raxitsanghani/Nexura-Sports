@@ -41,7 +41,12 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
         <TabsContent value="details">
           <div>
             <h2 className="text-lg font-bold mb-2">Product details</h2>
-            <p className="whitespace-pre-wrap text-gray-700">{product.details}</p>
+            {typeof product.details === 'string' ? (
+              <p className="whitespace-pre-wrap text-gray-700">{product.details}</p>
+            ) : (
+              // @ts-ignore
+              <VerticalTable product={{ description: product.details || {} }} />
+            )}
           </div>
         </TabsContent>
       ) : null}
@@ -54,7 +59,7 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
                 <React.Fragment key={index}>
                   <div className="flex gap-2 p-1">
                     <img
-                      src={review.reviewerPhoto || "/default-profile.png"}
+                      src={review.reviewerPhoto || `https://ui-avatars.com/api/?name=${review.reviewerName || "Anonymous"}&background=random`}
                       alt=""
                       className="w-10 h-10 rounded-full"
                     />
