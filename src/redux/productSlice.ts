@@ -35,6 +35,7 @@ export const fetchProducts = createAsyncThunk(
     const productList = productSnapshot.docs.reduce((acc, doc) => {
       acc[doc.id] = {
         ...(doc.data() as Product),
+        id: doc.id,
         isFavorite: doc.data().isFavorite || false,
       };
       return acc;
@@ -72,7 +73,10 @@ export const fetchProductsByIds = createAsyncThunk(
     const q = query(productCollection, where("__name__", "in", productIds));
     const productSnapshot = await getDocs(q);
     const productList = productSnapshot.docs.reduce((acc, doc) => {
-      acc[doc.id] = doc.data() as Product;
+      acc[doc.id] = {
+        ...(doc.data() as Product),
+        id: doc.id,
+      };
       return acc;
     }, {} as Record<string, Product>);
     return productList;
