@@ -8,7 +8,7 @@ import { fetchUserFavorites } from "@/utils/fetchUserFavorites";
 import ReactLoading from "react-loading";
 import { Product } from "@/types";
 import ProductCard from "./ProductCard";
-import FilterSidebar from "./FilterSidebar";
+
 
 interface ProductListProps {
   selectedCategory?: string;
@@ -121,7 +121,7 @@ const ProductList: React.FC<ProductListProps> = ({ selectedCategory }) => {
 
         <div className="flex flex-col lg:flex-row">
           {/* Sidebar */}
-          <FilterSidebar />
+
 
           {/* Grid */}
           <div className="flex-1">
