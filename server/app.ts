@@ -26,35 +26,35 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // Routes
 app.get('/', (req, res) => {
-    res.render('index', { title: 'Nexura - Home' });
+    res.render('index', { title: 'Nexura Sports - Home' });
 });
 
 app.get('/login', (req, res) => {
-    res.render('login', { title: 'Nexura - Login' });
+    res.render('login', { title: 'Nexura Sports - Login' });
 });
 
 app.get('/signup', (req, res) => {
-    res.render('signup', { title: 'Nexura - Signup' });
+    res.render('signup', { title: 'Nexura Sports - Signup' });
 });
 
 app.get('/woman', (req, res) => {
-    res.render('category', { title: 'Nexura - Woman', category: 'Woman' });
+    res.render('category', { title: 'Nexura Sports - Woman', category: 'Woman' });
 });
 
 app.get('/man', (req, res) => {
-    res.render('category', { title: 'Nexura - Man', category: 'Man' });
+    res.render('category', { title: 'Nexura Sports - Man', category: 'Man' });
 });
 
 app.get('/kids', (req, res) => {
-    res.render('category', { title: 'Nexura - Kids', category: 'Kids' });
+    res.render('category', { title: 'Nexura Sports - Kids', category: 'Kids' });
 });
 
 app.get('/sports', (req, res) => {
-    res.render('category', { title: 'Nexura - Sports', category: 'Sports' });
+    res.render('category', { title: 'Nexura Sports - Sports', category: 'Sports' });
 });
 
 app.get('/sale', (req, res) => {
-    res.render('category', { title: 'Nexura - Sale', category: 'Sale' });
+    res.render('category', { title: 'Nexura Sports - Sale', category: 'Sale' });
 });
 
 app.get('/favorites', (req, res) => {

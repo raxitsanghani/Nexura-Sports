@@ -10,6 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
+import { auth } from "@/Database/firebase";
+import { signOut } from "firebase/auth";
 //@ts-ignore
 export function DropdownMenuComp({ profilePicUrl }) {
   const openGitHub = () => {
@@ -57,7 +59,14 @@ export function DropdownMenuComp({ profilePicUrl }) {
         </DropdownMenuItem>
 
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={async () => {
+          try {
+            await signOut(auth);
+            window.location.href = "/";
+          } catch (error) {
+            console.error("Error logging out: ", error);
+          }
+        }}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
 

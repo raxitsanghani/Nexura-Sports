@@ -33,10 +33,10 @@ const App = () => {
     const titleElement = document.getElementById("title");
     if (titleElement) {
       if (location.pathname === "/") {
-        document.title = "Nexura - Home";
+        document.title = "Nexura Sports - Home";
       } else {
         const pathName = capitalizePath(location.pathname);
-        document.title = "Nexura - " + pathName;
+        document.title = "Nexura Sports - " + pathName;
       }
     }
   }, [location]);
