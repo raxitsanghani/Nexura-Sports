@@ -59,7 +59,16 @@ const Login = () => {
 
     // Normal User Login
     signInWithEmailAndPassword(auth, user.email, user.password)
-      .then(() => {
+      .then(async (userCredential) => {
+        // Check if user is blocked in Firestore
+        const userRef = doc(db, "users", userCredential.user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists() && userSnap.data().isBlocked) {
+          await auth.signOut(); // Immediately sign out
+          throw new Error("Your account has been blocked by the administrator.");
+        }
+
         toast({ description: "Login Success!" });
         form.reset();
         setLoading(false);
@@ -69,7 +78,18 @@ const Login = () => {
         console.log(error);
 
         const errorMessage = error.message;
-        toast({ variant: "destructive", title: errorMessage });
+
+        // Custom Block Message
+        if (errorMessage === "Your account has been blocked by the administrator.") {
+          toast({
+            variant: "destructive",
+            title: "Access Denied",
+            description: "Your account has been blocked by the administrator.",
+            duration: 5000
+          });
+        } else {
+          toast({ variant: "destructive", title: "Login Failed", description: "Invalid email or password." });
+        }
         setLoading(false);
       });
   };
@@ -88,6 +108,7 @@ const Login = () => {
           email: user.email,
           photoUrl: user.photoUrl ? user.photoUrl : "",
           createdAt: new Date(),
+          isBlocked: false, // Default status
         });
 
         setLoading(false);
@@ -97,6 +118,19 @@ const Login = () => {
         toast({ variant: "destructive", title: error });
       }
     } else {
+      // Check block status also for Google Login if needed, or update logic here
+      if (userData.data().isBlocked) {
+        await auth.signOut();
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: "Your account has been blocked by the administrator.",
+          duration: 5000
+        });
+        setLoading(false);
+        // Prevent further execution for this login attempt
+        return false;
+      }
       setLoading(false);
     }
   }
@@ -105,13 +139,30 @@ const Login = () => {
     setLoading(true);
     try {
       signInWithPopup(auth, provider)
-        .then((result) => {
+        .then(async (result) => {
           // This gives you a Google Access Token. You can use it to access the Google API.
 
           // The signed-in user info.
           const user = result.user;
           // IdP data available using getAdditionalUserInfo(result)
           // ...\
+
+          // Check Block Status inside createDoc wrapper or separately
+          const userRef = doc(db, "users", user.uid);
+          const userSnap = await getDoc(userRef);
+
+          if (userSnap.exists() && userSnap.data().isBlocked) {
+            await auth.signOut();
+            toast({
+              variant: "destructive",
+              title: "Access Denied",
+              description: "Your account has been blocked by the administrator.",
+              duration: 5000
+            });
+            setLoading(false);
+            return;
+          }
+
           createDoc(user);
           toast({ description: "Login Success!" });
 

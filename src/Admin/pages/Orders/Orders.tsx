@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   getFirestore,
   collection,
   query,
-  orderBy,
   onSnapshot,
   doc,
   deleteDoc,
@@ -12,14 +11,15 @@ import {
 import TableThree from "@/Admin/components/Tables/TableThree";
 import ReactLoading from "react-loading";
 import toast, { Toaster } from 'react-hot-toast';
+import { Order } from "../../types/types";
 
 const Orders = () => {
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const db = getFirestore();
 
   useEffect(() => {
-    const q = query(collection(db, "orders")); // Client-side sort if needed or use orderBy("timestamp", "desc") if index exists
+    const q = query(collection(db, "orders"));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetchedOrders = snapshot.docs.map(doc => {
@@ -32,18 +32,20 @@ const Orders = () => {
           userName: data.address?.name || "Unknown",
           // Timestamp handling
           timestamp: data.timestamp?.toDate ? data.timestamp.toDate().toDateString() : (data.date || new Date().toDateString()),
-          rawTimestamp: data.timestamp
-        };
+          rawTimestamp: data.timestamp,
+          userId: data.userId || "", // Ensure userId exists
+          status: data.status || "Processing"
+        } as unknown as Order & { rawTimestamp?: { seconds: number } };
       });
 
       // Sort Newest First (Client-side fallback)
-      fetchedOrders.sort((a: any, b: any) => {
+      fetchedOrders.sort((a, b) => {
         const timeA = a.rawTimestamp?.seconds || 0;
         const timeB = b.rawTimestamp?.seconds || 0;
         return timeB - timeA;
       });
 
-      setOrders(fetchedOrders as any);
+      setOrders(fetchedOrders);
       setLoading(false);
     }, (error) => {
       console.error("Error fetching orders:", error);
@@ -52,13 +54,9 @@ const Orders = () => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [db]);
 
-  const handleDelete = async (userId: string, orderId: string) => {
-    // Note: orderId in TableThree is passed, but we essentially need the doc ID.
-    // In our new schema, orderId IS the doc ID (e.g., #AB123).
-    // The previous TableThree implementation passed (userId, orderId). 
-    // We will assume orderId is the Doc ID.
+  const handleDelete = async (_userId: string, orderId: string) => {
     try {
       await deleteDoc(doc(db, "orders", orderId));
       toast.success("Order deleted permanently");
@@ -68,7 +66,7 @@ const Orders = () => {
     }
   };
 
-  const handleUpdateStatus = async (userId: string, orderId: string, newStatus: string) => {
+  const handleUpdateStatus = async (_userId: string, orderId: string, newStatus: string) => {
     try {
       await updateDoc(doc(db, "orders", orderId), { status: newStatus });
       toast.success(`Status updated to ${newStatus}`);
@@ -99,8 +97,6 @@ const Orders = () => {
           </div>
         ), { duration: 2000 });
       } else {
-        // Reject: Revert to Processing (or maybe keep it requesting but mark rejected? 
-        // Prompt says "Order remains active". Status 'Processing' implies active.
         await updateDoc(doc(db, "orders", orderId), {
           status: "Processing",
           cancellationReason: null // Optional: clear reason
@@ -140,7 +136,6 @@ const Orders = () => {
           orders={orders}
           onCancel={handleDelete}
           onUpdateStatus={handleUpdateStatus}
-          // @ts-ignore - Passing extra prop for cancellation logic
           onHandleCancellation={handleCancellationRequest}
         />
       )}
