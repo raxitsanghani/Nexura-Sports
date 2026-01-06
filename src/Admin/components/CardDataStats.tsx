@@ -17,27 +17,26 @@ const CardDataStats: React.FC<CardDataStatsProps> = ({
   children,
 }) => {
   return (
-    <div className="rounded-sm p-2 border border-stroke bg-white py-6 px-7.5 shadow-default dark:border-strokedark dark:bg-boxdark">
-      <div className="flex  p-4   items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
+    <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm hover:shadow-lg transition-shadow duration-300 dark:border-gray-800 dark:bg-boxdark dark:shadow-none">
+      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 dark:bg-meta-4 text-primary">
         {children}
       </div>
 
-      <div className="mt-4 flex items-end justify-between">
+      <div className="mt-6 flex items-end justify-between">
         <div>
-          <h4 className="p-2 text-title-md font-bold text-black dark:text-white">
+          <h4 className="text-2xl font-bold text-black dark:text-white">
             {total}
           </h4>
-          <span className="p-2 text-sm font-medium">{title}</span>
+          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</span>
         </div>
 
         <span
-          className={`flex items-center gap-1 text-sm font-medium ${
-            levelUp && "text-meta-3"
-          } ${levelDown && "text-meta-5"} `}
+          className={`flex items-center gap-1 text-sm font-medium ${levelUp && "text-emerald-500"
+            } ${levelDown && "text-red-500"} `}
         >
           {levelUp && (
             <svg
-              className="fill-meta-3"
+              className="fill-current"
               width="10"
               height="11"
               viewBox="0 0 10 11"
@@ -52,7 +51,7 @@ const CardDataStats: React.FC<CardDataStatsProps> = ({
           )}
           {levelDown && (
             <svg
-              className="fill-meta-5"
+              className="fill-current"
               width="10"
               height="11"
               viewBox="0 0 10 11"

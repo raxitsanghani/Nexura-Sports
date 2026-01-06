@@ -65,6 +65,20 @@ const ProductImage = ({ selectedColor, product }: ProductImageProps) => {
 
   const [mainImage, setMainImage] = useState<string | undefined>(getInitialMainImage());
   const [showAllImages, setShowAllImages] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [zoomOrigin, setZoomOrigin] = useState("50% 50%");
+
+  const handleImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
+    if (isZoomed) {
+      setIsZoomed(false);
+    } else {
+      const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+      const x = ((e.clientX - left) / width) * 100;
+      const y = ((e.clientY - top) / height) * 100;
+      setZoomOrigin(`${x}% ${y}%`);
+      setIsZoomed(true);
+    }
+  };
 
   // Sync mainImage when the effective color changes (e.g. user selects a different color)
   useEffect(() => {
@@ -82,6 +96,11 @@ const ProductImage = ({ selectedColor, product }: ProductImageProps) => {
   const handleThumbnailClick = (imageUrl: string) => {
     setMainImage(imageUrl);
   };
+
+  // Reset zoom when image changes
+  useEffect(() => {
+    setIsZoomed(false);
+  }, [mainImage]);
 
 
 
@@ -136,7 +155,13 @@ const ProductImage = ({ selectedColor, product }: ProductImageProps) => {
         <img
           src={mainImage || product.defaultImage || "https://placehold.co/600x400?text=No+Image"}
           alt="Main Display"
-          className="max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-110 cursor-zoom-in"
+          onClick={handleImageClick}
+          style={{
+            transformOrigin: zoomOrigin,
+            transform: isZoomed ? "scale(2.5)" : "scale(1)",
+            cursor: isZoomed ? "zoom-out" : "zoom-in"
+          }}
+          className="max-w-full max-h-full object-contain transition-transform duration-500"
         />
       </div>
     </div>

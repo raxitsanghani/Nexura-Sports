@@ -64,7 +64,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   return (
     <aside
       ref={sidebar}
-      className={`absolute left-0 top-0 z-9999 flex h-screen w-72.5 p-3 py-8 flex-col overflow-y-hidden bg-black duration-300 ease-linear dark:bg-boxdark lg:static lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+      className={`absolute left-0 top-0 z-9999 flex h-screen w-72.5 flex-col overflow-y-hidden bg-black/95 backdrop-blur-xl duration-300 ease-in-out dark:bg-boxdark lg:static lg:translate-x-0 border-r border-gray-800/50 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
     >
       {/* <!-- SIDEBAR HEADER --> */}
@@ -99,7 +99,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
 
       <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear h-full">
         {/* <!-- Sidebar Menu --> */}
-        <nav className="mt-5 py-4 px-4 lg:mt-9 lg:px-6 h-full">
+        <nav className="mt-5 py-4 px-4 lg:mt-9 lg:px-6 h-full font-medium">
           {/* <!-- Menu Group --> */}
 
           <div className="flex  flex-col h-full justify-between">
@@ -115,9 +115,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     <React.Fragment>
                       <NavLink
                         to="#"
-                        className={`group relative flex items-center  text-white gap-2.5 w-full justify-center border-2 border-gray-800  p-2  rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${(pathname === "/admin" ||
+                        className={`group relative flex items-center gap-3 w-full justify-start rounded-xl px-4 py-3 text-white/80 duration-200 ease-in-out hover:bg-white/10 hover:text-white ${(pathname === "/admin" ||
                           pathname.includes("dashboard")) &&
-                          "bg-graydark dark:bg-meta-4"
+                          "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
                           }`}
                         onClick={(e) => {
                           e.preventDefault();
@@ -206,9 +206,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                     <React.Fragment>
                       <NavLink
                         to="#"
-                        className={`group relative flex items-center text-white gap-2.5 w-full justify-center border-2 border-gray-800  p-2   rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${(pathname === "/admin" ||
+                        className={`group relative flex items-center gap-3 w-full justify-start rounded-xl px-4 py-3 text-white/80 duration-200 ease-in-out hover:bg-white/10 hover:text-white ${(pathname === "/admin" ||
                           pathname.includes("dashboard")) &&
-                          "bg-graydark dark:bg-meta-4"
+                          "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
                           }`}
                         onClick={(e) => {
                           e.preventDefault();
@@ -217,7 +217,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             : setSidebarExpanded(true);
                         }}
                       >
-                        <FaCartFlatbedSuitcase size={22} /> Manage Products
+                        <FaCartFlatbedSuitcase className="w-5 h-5 flex-shrink-0" /> Manage Products
                         <svg
                           className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open && "rotate-180"
                             }`}
@@ -245,10 +245,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             <NavLink
                               to="/admin/add-product"
                               className={({ isActive }) =>
-                                "group relative flex items-center  text-white gap-2.5 w-full justify-center bg-gray-900 hover:bg-gray-800 p-2  rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white " +
-                                (isActive && "!text-white")
+                                "group relative flex items-center gap-2.5 rounded-lg px-4 py-2 text-sm text-gray-400 duration-200 hover:text-white " +
+                                (isActive && "text-white font-semibold")
                               }
                             >
+                              <span className={`w-2 h-2 rounded-full ${pathname === '/admin/add-product' ? 'bg-blue-500' : 'bg-gray-700 group-hover:bg-gray-500'}`}></span>
                               Add Product
                             </NavLink>
                           </li>
@@ -256,10 +257,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             <NavLink
                               to="/admin/all-products"
                               className={({ isActive }) =>
-                                "group relative flex items-center  text-white gap-2.5 w-full justify-center bg-gray-900 hover:bg-gray-800 p-2  rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white " +
-                                (isActive && "!text-white")
+                                "group relative flex items-center gap-2.5 rounded-lg px-4 py-2 text-sm text-gray-400 duration-200 hover:text-white " +
+                                (isActive && "text-white font-semibold")
                               }
                             >
+                              <span className={`w-2 h-2 rounded-full ${pathname === '/admin/all-products' ? 'bg-blue-500' : 'bg-gray-700 group-hover:bg-gray-500'}`}></span>
                               All Products
                             </NavLink>
                           </li>
@@ -267,10 +269,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             <NavLink
                               to="/admin/product-reviews"
                               className={({ isActive }) =>
-                                "group relative flex items-center  text-white gap-2.5 w-full justify-center bg-gray-900 hover:bg-gray-800 p-2  rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white " +
-                                (isActive && "!text-white")
+                                "group relative flex items-center gap-2.5 rounded-lg px-4 py-2 text-sm text-gray-400 duration-200 hover:text-white " +
+                                (isActive && "text-white font-semibold")
                               }
                             >
+                              <span className={`w-2 h-2 rounded-full ${pathname === '/admin/product-reviews' ? 'bg-blue-500' : 'bg-gray-700 group-hover:bg-gray-500'}`}></span>
                               Product Reviews
                             </NavLink>
                           </li>
@@ -287,10 +290,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               <li>
                 <NavLink
                   to="/admin/order"
-                  className={`group relative flex items-center text-white gap-2.5 w-full justify-center border-2 border-gray-800  p-2  rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${pathname.includes("profile") && "bg-graydark dark:bg-meta-4"
+                  className={`group relative flex items-center gap-3 w-full justify-start rounded-xl px-4 py-3 text-white/80 duration-200 ease-in-out hover:bg-white/10 hover:text-white ${pathname.includes("order") && "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
                     }`}
                 >
-                  <LuPackageCheck size={22} />
+                  <LuPackageCheck className="w-5 h-5 flex-shrink-0" />
                   Orders
                 </NavLink>
               </li>
@@ -298,10 +301,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               <li>
                 <NavLink
                   to="/admin/users"
-                  className={`group relative flex items-center  text-white gap-2.5 w-full justify-center border-2 border-gray-800  p-2   rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${pathname.includes("profile") && "bg-graydark dark:bg-meta-4"
+                  className={`group relative flex items-center gap-3 w-full justify-start rounded-xl px-4 py-3 text-white/80 duration-200 ease-in-out hover:bg-white/10 hover:text-white ${pathname.includes("users") && "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
                     }`}
                 >
-                  <FaUsers size={22} />
+                  <FaUsers className="w-5 h-5 flex-shrink-0" />
                   Users
                 </NavLink>
               </li>
@@ -310,11 +313,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
             <button
               onClick={handleLogout}
               className={
-                "group relative flex items-center text-white gap-2.5 w-full justify-center bg-gray-800 rounded-md p-2 font-medium text-bodydark2 duration-300 ease-in-out "
+                "group relative flex items-center gap-2.5 w-full justify-center bg-white/5 hover:bg-red-600/20 hover:text-red-500 rounded-xl p-3 font-medium text-gray-400 duration-300 ease-in-out mt-auto border border-white/5 hover:border-red-500/30"
               }
             >
               Logout
-              <Logout />
+              <Logout className="w-5 h-5" />
             </button>
           </div>
         </nav>

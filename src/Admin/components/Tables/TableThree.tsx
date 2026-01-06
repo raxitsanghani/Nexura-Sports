@@ -16,19 +16,19 @@ const TableThree: React.FC<TableThreeProps> = ({
   const safeOrders = Array.isArray(orders) ? orders : [];
 
   return (
-    <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+    <div className="rounded-xl border border-gray-100 bg-white px-5 pt-6 pb-2.5 shadow-sm dark:border-gray-800 dark:bg-boxdark sm:px-7.5 xl:pb-1 overflow-hidden">
       <div className="max-w-full overflow-x-auto">
         <table className="w-full table-auto border-collapse">
           <thead>
-            <tr className="bg-gray-2 text-left dark:bg-meta-4">
-              <th className="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">Order Info</th>
-              <th className="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">Customer</th>
-              <th className="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">Date</th>
-              <th className="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">Status</th>
-              <th className="py-4 px-4 font-medium text-black dark:text-white">Actions</th>
+            <tr className="bg-gray-50 text-left dark:bg-meta-4/50 border-b border-gray-100 dark:border-gray-800">
+              <th className="min-w-[150px] py-4 px-4 font-semibold text-black dark:text-white">Order Info</th>
+              <th className="min-w-[120px] py-4 px-4 font-semibold text-black dark:text-white">Customer</th>
+              <th className="min-w-[120px] py-4 px-4 font-semibold text-black dark:text-white">Date</th>
+              <th className="min-w-[120px] py-4 px-4 font-semibold text-black dark:text-white">Status</th>
+              <th className="py-4 px-4 font-semibold text-black dark:text-white">Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
             {safeOrders.map((order: Order) => (
               <OrderRow
                 key={order.orderId}
@@ -184,11 +184,11 @@ const OrderRow: React.FC<OrderRowProps> = ({
           <div className="flex flex-col space-y-2 items-start">
             {order.status === "Cancellation Requested" ? (
               <div className="flex items-center space-x-2">
-                <button onClick={() => onHandleCancellation?.(order.orderId, 'accept')} className="bg-green-500 text-white px-3 py-1 rounded shadow hover:bg-green-600 text-xs font-medium transition">Accept</button>
-                <button onClick={() => onHandleCancellation?.(order.orderId, 'reject')} className="bg-red-500 text-white px-3 py-1 rounded shadow hover:bg-red-600 text-xs font-medium transition">Reject</button>
+                <button onClick={() => onHandleCancellation?.(order.orderId, 'accept')} className="bg-emerald-500 text-white px-3 py-1.5 rounded-lg shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 text-xs font-semibold transition-all duration-200">Accept</button>
+                <button onClick={() => onHandleCancellation?.(order.orderId, 'reject')} className="bg-red-500 text-white px-3 py-1.5 rounded-lg shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 text-xs font-semibold transition-all duration-200">Reject</button>
               </div>
             ) : order.status === "Cancelled" ? (
-              <button onClick={() => onCancel(order.userId, order.orderId)} className="bg-red-500 text-white rounded px-3 py-1 text-xs hover:bg-red-600 transition">Delete</button>
+              <button onClick={() => onCancel(order.userId, order.orderId)} className="bg-red-500 text-white px-3 py-1.5 rounded-lg shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 text-xs font-semibold transition-all duration-200">Delete</button>
             ) : (
               <div className="flex flex-col gap-2 w-full max-w-[140px]">
                 <div className="flex gap-2">
@@ -198,13 +198,13 @@ const OrderRow: React.FC<OrderRowProps> = ({
                     <option value="Confirmed">Confirmed</option>
                     <option value="Cancelled">Cancelled</option>
                   </select>
-                  <button onClick={() => { if (statusUpdate) { onUpdateStatus(order.userId, order.orderId, statusUpdate); setStatusUpdate(undefined); } }} className="bg-blue-600 text-white rounded px-2 py-1 text-xs hover:bg-blue-700 transition">Save</button>
+                  <button onClick={() => { if (statusUpdate) { onUpdateStatus(order.userId, order.orderId, statusUpdate); setStatusUpdate(undefined); } }} className="bg-blue-600 text-white px-3 py-1.5 rounded-lg shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 text-xs font-semibold transition-all duration-200">Save</button>
                 </div>
-                <button onClick={() => onCancel(order.userId, order.orderId)} className="text-red-500 text-xs hover:text-red-700 transition text-left">Delete Order</button>
+                <button onClick={() => onCancel(order.userId, order.orderId)} className="text-red-500 hover:text-red-700 text-xs font-medium transition-colors text-left hover:underline decoration-red-200 underline-offset-2">Delete Order</button>
               </div>
             )}
-            <button onClick={() => setIsExpanded(!isExpanded)} className="group flex items-center gap-1 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 transition-colors mt-2">
-              {isExpanded ? <>View Less Details <FiChevronUp /></> : <>View More Details <FiChevronDown /></>}
+            <button onClick={() => setIsExpanded(!isExpanded)} className="group flex items-center gap-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 transition-all hover:translate-x-1 mt-2">
+              {isExpanded ? <>View Less <FiChevronUp /></> : <>View Details <FiChevronDown /></>}
             </button>
           </div>
         </td>

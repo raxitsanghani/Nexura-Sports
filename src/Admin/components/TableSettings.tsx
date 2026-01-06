@@ -53,13 +53,15 @@ export const Table: React.FC<TableProps> = ({ rows, deleteRow, editRow }) => {
                 </td>
 
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
-                  <span className="actions flex grid-cols-2 gap-4">
+                  <span className="actions flex items-center gap-4">
                     <BsFillTrashFill
-                      className="delete-btn cursor-pointer"
+                      className="delete-btn cursor-pointer text-gray-400 hover:text-red-500 transition-all hover:scale-110"
+                      size={18}
                       onClick={() => deleteRow(idx)} />
 
                     <BsFillPencilFill
-                      className="edit-btn cursor-pointer"
+                      className="edit-btn cursor-pointer text-gray-400 hover:text-indigo-500 transition-all hover:scale-110"
+                      size={18}
                       onClick={() => editRow(idx)} />
 
                   </span>

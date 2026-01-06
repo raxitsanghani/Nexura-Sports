@@ -261,7 +261,7 @@ const EditProduct: React.FC = () => {
             <button
               type="button"
               onClick={handleAddColor}
-              className="ml-2 px-4 py-2 bg-gray-600 text-white font-bold rounded-md hover:bg-gray-800"
+              className="ml-2 px-4 py-3 bg-black text-white font-bold rounded-xl hover:bg-gray-800 transition-all shadow-md hover:scale-105 active:scale-95"
             >
               Add Color
             </button>
@@ -289,9 +289,9 @@ const EditProduct: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleDeleteImage(color, url)}
-                    className="absolute top-0 px-2 py-2 right-0 bg-red-500 text-white rounded-full p-1"
+                    className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md hover:scale-110 active:scale-90 cursor-pointer"
                   >
-                    <RxCross1 />
+                    <RxCross1 size={14} />
                   </button>
                 </div>
               ))}
@@ -334,7 +334,7 @@ const EditProduct: React.FC = () => {
                       deleteObject(imageRef).catch(e => console.error("Del def img err", e));
                     }
                   }}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg cursor-pointer"
+                  className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md hover:scale-110 active:scale-90 cursor-pointer"
                 >
                   <RxCross1 size={14} />
                 </button>
@@ -354,7 +354,7 @@ const EditProduct: React.FC = () => {
                   onClick={() => {
                     setDefaultImageFiles(prev => prev.filter((_, i) => i !== index));
                   }}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center cursor-pointer shadow-lg"
+                  className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md hover:scale-110 active:scale-90 cursor-pointer"
                 >
                   <RxCross1 size={14} />
                 </button>
@@ -406,7 +406,7 @@ const EditProduct: React.FC = () => {
         </div>
         <button
           type="submit"
-          className="w-full px-4 py-2 bg-black text-white font-bold rounded-md hover:bg-blue-600"
+          className="w-full px-6 py-4 bg-black text-white font-bold rounded-xl hover:bg-gray-900 transition-all shadow-md hover:shadow-lg hover:-translate-y-1 active:scale-95"
         >
           Update Product
         </button>

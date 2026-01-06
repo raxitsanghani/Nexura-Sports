@@ -275,7 +275,7 @@ const AddProduct = () => {
             <button
               type="button"
               onClick={handleAddColor}
-              className="w-8 h-8 flex items-center justify-center bg-black text-white rounded-full hover:bg-gray-800 transition-colors text-xl font-bold"
+              className="w-10 h-10 flex items-center justify-center bg-black text-white rounded-full hover:bg-gray-800 hover:scale-110 active:scale-90 transition-all shadow-md text-xl font-bold"
               title="Add another color"
             >
               +
@@ -301,7 +301,7 @@ const AddProduct = () => {
                     <button
                       type="button"
                       onClick={() => handleRemoveDefaultImage(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                      className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md hover:scale-110 active:scale-90 cursor-pointer"
                     >
                       ×
                     </button>
@@ -321,7 +321,7 @@ const AddProduct = () => {
               <button
                 type="button"
                 onClick={() => handleRemoveColor(color)}
-                className="text-red-500 hover:text-red-700 font-medium"
+                className="text-red-500 hover:text-red-700 font-medium hover:underline transition-colors"
               >
                 Remove Color
               </button>
@@ -345,7 +345,7 @@ const AddProduct = () => {
                     <button
                       type="button"
                       onClick={() => handleRemoveImage(color, index)}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                      className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md hover:scale-110 active:scale-90 cursor-pointer"
                     >
                       ×
                     </button>
@@ -401,7 +401,7 @@ const AddProduct = () => {
         <button
           type="submit"
           disabled={loading}
-          className={`w-full px-4 py-3 text-white font-bold rounded-md transition-all ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-800"
+          className={`w-full px-6 py-4 text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-1 active:scale-95 ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-900"
             }`}
         >
           {loading ? "Adding Product..." : "Add Product"}

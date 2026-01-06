@@ -90,50 +90,58 @@ const AllProducts = () => {
         <button
           onClick={fixCategories}
           disabled={isFixing}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
+          className="bg-blue-600 text-white px-5 py-2.5 rounded-xl hover:bg-blue-700 disabled:bg-gray-400 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-95 font-semibold text-sm"
         >
           {isFixing ? "Fixing..." : "Auto-Assign Categories"}
         </button>
       </div>
-      <table className="min-w-full border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="py-2 px-4 border">Product Name</th>
-            <th className="py-2 px-4 border">Price</th>
-            <th className="py-2 px-4 border">Default Image</th>
-            <th className="py-2 px-4 border">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((product) => (
-            <tr key={product.id} className="hover:bg-gray-100">
-              <td className="py-2 px-4 border">{product.name}</td>
-              <td className="py-2 px-4 border">₹{Number(product.price).toFixed(2)}</td>
-              <td className="py-2 px-4 border">
-                <img
-                  src={product.defaultImage || "default-image-url.jpg"}
-                  alt={product.name}
-                  className="w-16 h-16"
-                />
-              </td>
-              <td className="py-2 px-4 border">
-                <Link
-                  to={`/admin/edit-product/${product.id}`}
-                  className="text-blue-500 hover:underline"
-                >
-                  Edit
-                </Link>
-                <button
-                  onClick={() => handleDelete(product.id)}
-                  className="text-red-500 hover:underline ml-4"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="rounded-xl border border-gray-100 bg-white shadow-sm overflow-hidden dark:border-gray-800 dark:bg-boxdark">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead className="bg-gray-50 dark:bg-meta-4/50 border-b border-gray-100 dark:border-gray-800">
+              <tr>
+                <th className="py-4 px-6 font-semibold text-gray-900 dark:text-white">Product Name</th>
+                <th className="py-4 px-6 font-semibold text-gray-900 dark:text-white">Price</th>
+                <th className="py-4 px-6 font-semibold text-gray-900 dark:text-white">Default Image</th>
+                <th className="py-4 px-6 font-semibold text-gray-900 dark:text-white text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+              {products.map((product) => (
+                <tr key={product.id} className="hover:bg-gray-50 dark:hover:bg-meta-4/20 transition-colors">
+                  <td className="py-4 px-6 font-medium text-gray-900 dark:text-white">{product.name}</td>
+                  <td className="py-4 px-6 text-gray-600 dark:text-gray-300">₹{Number(product.price).toFixed(2)}</td>
+                  <td className="py-4 px-6">
+                    <div className="h-12 w-12 rounded-lg overflow-hidden border border-gray-200 bg-gray-100">
+                      <img
+                        src={product.defaultImage || "default-image-url.jpg"}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </td>
+                  <td className="py-4 px-6 text-right">
+                    <div className="flex justify-end gap-2">
+                      <Link
+                        to={`/admin/edit-product/${product.id}`}
+                        className="inline-block bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(product.id)}
+                        className="inline-block bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-100 hover:text-red-700 transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };

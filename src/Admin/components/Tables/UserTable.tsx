@@ -22,19 +22,19 @@ interface UserTableProps {
 
 const UserTable: React.FC<UserTableProps> = ({ users, onBlock, onDelete }) => {
   return (
-    <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+    <div className="rounded-xl border border-gray-100 bg-white px-5 pt-6 pb-2.5 shadow-sm dark:border-gray-800 dark:bg-boxdark sm:px-7.5 xl:pb-1 overflow-hidden">
       <div className="max-w-full overflow-x-auto">
         <table className="w-full table-auto border-collapse">
           <thead>
-            <tr className="bg-gray-2 text-left dark:bg-meta-4">
-              <th className="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">Profile Picture</th>
-              <th className="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white">User Name</th>
-              <th className="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white">Total Orders</th>
-              <th className="min-w-[200px] py-4 px-4 font-medium text-black dark:text-white">Email</th>
-              <th className="py-4 px-4 font-medium text-black dark:text-white">Actions</th>
+            <tr className="bg-gray-50 text-left dark:bg-meta-4/50 border-b border-gray-100 dark:border-gray-800">
+              <th className="min-w-[120px] py-4 px-4 font-semibold text-black dark:text-white">Profile Picture</th>
+              <th className="min-w-[150px] py-4 px-4 font-semibold text-black dark:text-white">User Name</th>
+              <th className="min-w-[120px] py-4 px-4 font-semibold text-black dark:text-white">Total Orders</th>
+              <th className="min-w-[200px] py-4 px-4 font-semibold text-black dark:text-white">Email</th>
+              <th className="py-4 px-4 font-semibold text-black dark:text-white">Actions</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
             {users.map((user) => (
               <UserRow key={user.id} user={user} onBlock={onBlock} onDelete={onDelete} />
             ))}
@@ -154,7 +154,7 @@ const UserRow: React.FC<UserRowProps> = ({ user, onBlock, onDelete }) => {
             {(displayOrderCount > 0 || isExpanded) && (
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 text-sm font-bold transition-colors"
+                className="group flex items-center gap-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 transition-all hover:translate-x-1"
               >
                 {isExpanded ? "View Less" : "View Details"}
                 {isExpanded ? <FiChevronUp /> : <FiChevronDown />}
@@ -164,19 +164,19 @@ const UserRow: React.FC<UserRowProps> = ({ user, onBlock, onDelete }) => {
             {/* Block / Unblock */}
             <button
               onClick={() => onBlock(user.id, user.isBlocked || false)}
-              className={`flex items-center gap-1 text-sm px-3 py-1.5 rounded-md font-medium transition shadow-sm ${user.isBlocked
-                  ? "bg-green-100 text-green-700 hover:bg-green-200 border border-green-200"
-                  : "bg-orange-100 text-orange-700 hover:bg-orange-200 border border-orange-200"
+              className={`flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg font-semibold transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 duration-200 ${user.isBlocked
+                ? "bg-green-100 text-green-700 hover:bg-green-200 border border-green-200"
+                : "bg-orange-100 text-orange-700 hover:bg-orange-200 border border-orange-200"
                 }`}
             >
-              {user.isBlocked ? <FiUserCheck size={16} /> : <FiUserX size={16} />}
+              {user.isBlocked ? <FiUserCheck size={14} /> : <FiUserX size={14} />}
               {user.isBlocked ? "Unblock" : "Block"}
             </button>
 
             {/* Delete */}
             <button
               onClick={() => onDelete(user.id)}
-              className="text-gray-500 hover:text-red-600 p-2 rounded-full hover:bg-red-50 transition-colors"
+              className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-all hover:scale-110 active:scale-95"
               title="Delete User Permanently"
             >
               <FiTrash2 size={18} />
