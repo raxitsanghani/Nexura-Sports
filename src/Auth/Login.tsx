@@ -23,14 +23,16 @@ import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { getDoc } from "firebase/firestore";
 
-// Validation schema
-
 const LoginValidation = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters long" }),
 });
+
+import { motion } from "framer-motion";
+
+// Validation schema
 
 const Login = () => {
   const { toast } = useToast();
@@ -48,26 +50,21 @@ const Login = () => {
 
   const handleLogin = (user: z.infer<typeof LoginValidation>) => {
     setLoading(true);
-    console.log("User Data:", user);
-
-    // Check for Admin Credentials
     if (user.email === "raxitsanghani21@gmail.com" && user.password === "raxit2112") {
-      localStorage.setItem("authToken", "admin-token"); // Set token for Admin Protected Route
+      localStorage.setItem("authToken", "admin-token");
       toast({ description: "Admin Login Success!" });
       setLoading(false);
-      window.location.href = "/admin"; // Force reload/redirect to Admin Panel
+      window.location.href = "/admin";
       return;
     }
 
-    // Normal User Login
     signInWithEmailAndPassword(auth, user.email, user.password)
       .then(async (userCredential) => {
-        // Check if user is blocked in Firestore
         const userRef = doc(db, "users", userCredential.user.uid);
         const userSnap = await getDoc(userRef);
 
         if (userSnap.exists() && userSnap.data().isBlocked) {
-          await auth.signOut(); // Immediately sign out
+          await auth.signOut();
           throw new Error("Your account has been blocked by the administrator.");
         }
 
@@ -77,11 +74,7 @@ const Login = () => {
         navigate("/");
       })
       .catch((error) => {
-        console.log(error);
-
         const errorMessage = error.message;
-
-        // Custom Block Message
         if (errorMessage === "Your account has been blocked by the administrator.") {
           toast({
             variant: "destructive",
@@ -97,7 +90,6 @@ const Login = () => {
   };
 
   async function createDoc(user: any) {
-    //Create doc
     if (!user) return;
     setLoading(true);
 
@@ -110,17 +102,14 @@ const Login = () => {
           email: user.email,
           photoUrl: user.photoUrl ? user.photoUrl : "",
           createdAt: new Date(),
-          isBlocked: false, // Default status
+          isBlocked: false,
         });
-
         setLoading(false);
       } catch (error: any) {
         setLoading(false);
-
         toast({ variant: "destructive", title: error });
       }
     } else {
-      // Check block status also for Google Login if needed, or update logic here
       if (userData.data().isBlocked) {
         await auth.signOut();
         toast({
@@ -130,7 +119,6 @@ const Login = () => {
           duration: 5000
         });
         setLoading(false);
-        // Prevent further execution for this login attempt
         return false;
       }
       setLoading(false);
@@ -142,14 +130,7 @@ const Login = () => {
     try {
       signInWithPopup(auth, provider)
         .then(async (result) => {
-          // This gives you a Google Access Token. You can use it to access the Google API.
-
-          // The signed-in user info.
           const user = result.user;
-          // IdP data available using getAdditionalUserInfo(result)
-          // ...\
-
-          // Check Block Status inside createDoc wrapper or separately
           const userRef = doc(db, "users", user.uid);
           const userSnap = await getDoc(userRef);
 
@@ -167,14 +148,10 @@ const Login = () => {
 
           createDoc(user);
           toast({ description: "Login Success!" });
-
-          console.log("User>>>>", user);
           navigate("/");
           setLoading(false);
         })
         .catch((error) => {
-          // Handle Errors here.
-
           const errorMessage = error.message;
           toast({ variant: "destructive", title: errorMessage });
           setLoading(false);
@@ -186,32 +163,67 @@ const Login = () => {
   }
 
   return (
-    <Form {...form}>
-      <div className="flex flex-1 h-screen justify-center items-center flex-col py-10">
-        <div className="sm:w-420 md:w-[24rem] flex-center flex-col">
-          <div className="flex items-center gap-3 justify-center">
-            <img src={Images.LOGO} alt="logo" className="w-12" />
-            <h2 className="text-2xl ">Welcome to Nexura</h2>
-          </div>
+    <div className="relative min-h-screen w-full flex items-center justify-center p-6 overflow-hidden bg-[#0a0a0a]">
+      {/* Background Layer with soft blur */}
+      <motion.div
+        initial={{ scale: 1.1, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 2, ease: "easeOut" }}
+        className="fixed inset-0 z-0"
+      >
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-90"
+          style={{
+            backgroundImage: `url('https://images.unsplash.com/photo-1460353581641-37baddab0fa2?auto=format&fit=crop&q=80&w=2071')`,
+          }}
+        />
+        <div className="absolute inset-0 bg-black/40" />
+      </motion.div>
 
-          <h2 className="h3-bold md:h2-bold pt-5 sm:pt-6">
-            Log in to your account
-          </h2>
+      {/* Login Card */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+        className="relative z-10 w-full max-w-[460px] bg-white/10 backdrop-blur-md rounded-[3rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] border border-white/20 p-12"
+      >
+        <div className="flex flex-col items-center mb-10">
+          <motion.div
+            whileHover={{ scale: 1.1, rotate: 3 }}
+            className="p-5 rounded-[2rem] bg-white shadow-2xl mb-8"
+          >
+            <img
+              src={Images.LOGO}
+              alt="Nexura Logo"
+              className="w-20 h-20 object-contain brightness-110"
+            />
+          </motion.div>
+          <h1 className="text-5xl font-premium text-white tracking-tight mb-2 text-center">Nexura</h1>
+          <p className="text-white/60 font-medium text-center text-sm uppercase tracking-[0.3em]">Elite Performance</p>
+        </div>
 
+        <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleLogin)}
-            className="flex flex-col gap-2 w-full mt-4"
+            className="space-y-6"
           >
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="shad-form_label">Email</FormLabel>
+                  <FormLabel className="text-[10px] font-bold text-white/50 uppercase tracking-[0.2em] ml-2">Email Address</FormLabel>
                   <FormControl>
-                    <Input type="email" className="shad-input" {...field} />
+                    <motion.div whileFocus={{ scale: 1.01 }}>
+                      <Input
+                        type="email"
+                        placeholder="john@nexura.com"
+                        className="h-14 bg-white/5 border-white/10 focus:border-white/40 focus:bg-white/10 focus:ring-0 rounded-2xl transition-all font-semibold text-white placeholder:text-white/20"
+                        {...field}
+                      />
+                    </motion.div>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-[10px] font-bold text-red-400 uppercase tracking-widest px-2" />
                 </FormItem>
               )}
             />
@@ -221,80 +233,100 @@ const Login = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="shad-form_label">Password</FormLabel>
+                  <FormLabel className="text-[10px] font-bold text-white/50 uppercase tracking-[0.2em] ml-2">Secure Password</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        className="shad-input pr-10"
-                        {...field}
-                      />
+                      <motion.div whileFocus={{ scale: 1.01 }}>
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="••••••••"
+                          className="h-14 bg-white/5 border-white/10 focus:border-white/40 focus:bg-white/10 focus:ring-0 rounded-2xl pr-14 transition-all font-semibold text-white placeholder:text-white/20"
+                          {...field}
+                        />
+                      </motion.div>
                       <button
                         type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 focus:outline-none"
+                        className="absolute right-5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors"
                         onClick={() => setShowPassword(!showPassword)}
                       >
-                        {showPassword ? (
-                          <FaEyeSlash size={20} />
-                        ) : (
-                          <FaEye size={20} />
-                        )}
+                        {showPassword ? <FaEyeSlash size={22} /> : <FaEye size={22} />}
                       </button>
                     </div>
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-[10px] font-bold text-red-400 uppercase tracking-widest px-2" />
                 </FormItem>
               )}
             />
 
-            <Button
-              disabled={loading}
-              type="submit"
-              className="shad-button_primary mt-4"
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="pt-4"
             >
-              {loading ? (
-                <ReactLoading
-                  type={"bars"}
-                  height={30}
-                  width={30}
-                  color="black"
-                />
-              ) : (
-                "Login"
-              )}
-            </Button>
-            <h1 className="text-center">or</h1>
-            <Button
-              disabled={loading}
-              type="button"
-              onClick={googleAuth}
-              className="shad-button_primary mt-3 "
-            >
-              <FcGoogle size={"1.5rem"} className="mr-1" /> Sign Up With Google
-            </Button>
+              <Button
+                disabled={loading}
+                type="submit"
+                className="w-full h-16 bg-white hover:bg-white/90 text-black rounded-2xl font-black text-lg transition-all shadow-[0_20px_40px_-10px_rgba(255,255,255,0.3)] active:shadow-md uppercase tracking-widest"
+              >
+                {loading ? (
+                  <ReactLoading type="bars" height={28} width={28} color="#000" />
+                ) : (
+                  "Login"
+                )}
+              </Button>
+            </motion.div>
 
-            <Button
-              type="button"
-              variant="outline"
-              className="mt-3 w-full border-gray-400"
-              onClick={() => navigate("/checkout", { state: { isGuest: true } })}
-            >
-              Continue as Guest
-            </Button>
+            <div className="relative my-8 text-center flex items-center justify-center gap-4">
+              <div className="h-[1px] flex-1 bg-white/10"></div>
+              <span className="text-white/30 text-[10px] font-black uppercase tracking-[0.4em]">Auth Service</span>
+              <div className="h-[1px] flex-1 bg-white/10"></div>
+            </div>
 
-            <p className="text-small-regular text-light-2 text-center mt-2">
-              Don't have an account?
+            <div className="grid grid-cols-1 gap-4">
+              <motion.div
+                whileHover={{ scale: 1.02, backgroundColor: "rgba(255,255,255,0.15)" }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  disabled={loading}
+                  type="button"
+                  onClick={googleAuth}
+                  variant="outline"
+                  className="w-full h-14 border border-white/10 bg-white/5 hover:bg-transparent rounded-2xl flex items-center justify-center gap-3 font-bold text-white transition-all shadow-sm"
+                >
+                  <FcGoogle size={24} />
+                  <span className="uppercase tracking-[0.2em] text-xs">Continue with Google</span>
+                </Button>
+              </motion.div>
+            </div>
+
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full h-10 text-white/40 hover:text-white hover:bg-transparent transition-colors font-bold text-[10px] uppercase tracking-[0.2em]"
+                onClick={() => navigate("/checkout", { state: { isGuest: true } })}
+              >
+                Guest Checkout
+              </Button>
+            </motion.div>
+
+            <p className="text-center text-xs text-white/40 pt-4 font-bold uppercase tracking-widest">
+              No account?{" "}
               <Link
                 to="/signup"
-                className="text-cs_yellow  text-small-semibold ml-1"
+                className="text-white font-black hover:text-white/80 transition-all border-b border-white/20 hover:border-white pb-1 underline-offset-4"
               >
-                Sign Up
+                Join Nexura
               </Link>
             </p>
           </form>
-        </div>
-      </div>
-    </Form>
+        </Form>
+      </motion.div>
+    </div>
   );
 };
 

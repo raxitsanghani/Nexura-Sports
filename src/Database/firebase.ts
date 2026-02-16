@@ -22,6 +22,9 @@ export const storage = getStorage(app);
 
 // Initialize Google Auth Provider
 export const provider = new GoogleAuthProvider();
+provider.setCustomParameters({
+  prompt: "select_account",
+});
 
 // Export necessary Firestore methods if needed
 export { doc, setDoc };

@@ -2,7 +2,7 @@ import white from "./shoes/white.png";
 import profile from "./images.jpeg";
 import cart from "./cart.png";
 import carBg from "./shoes/car_bg.png";
-import LOGO from "./shoes/LOGO.jpg";
+import LOGO from "./logo.png";
 import logo_home from "./logo-home1.png";
 import nofav from "./no-fav.png";
 import bg from "./BG.png";
