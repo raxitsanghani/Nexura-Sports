@@ -17,9 +17,9 @@ import { DropdownMenuComp } from "@/pages/Other/DropdownMenu";
 import { Close } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import { selectTotalCartItems } from "@/redux/cartSlice";
-// import logo from "/public/nexura-logo.png";
-import logo1 from "/public/nexura-logo-1.png";
-// import logo2 from "/public/nexura-logo-2.png";
+// import logo from "/nexura-logo.png";
+const logo1 = "/nexura-logo-1.png";
+// import logo2 from "/nexura-logo-2.png";
 
 const menuList = [
   { name: "Home", path: "/" },
@@ -139,24 +139,24 @@ const Navbar = () => {
       {/* UpperNav */}
       <div className="flex flex-row sm:justify-between gap-3 items-center px-3">
         <div className="flex flex-row items-center gap-3">
-        <Link to={"/"} className="flex felx-row text-xl cursor-pointer">
-          <img src={logo1} alt="Logo" className="w-16" />
-          {/* <img src={logo2} alt="Logo" className="w-24 ml-10" /> */}
-        </Link>
-        <div className="sm:flex mt-2 text-gray-600 hidden shadow-gray-400 text-[13px] border border-gray-400 rounded-xl p-2 bg-white/30">
-        {menuList.map((menu, index) => (
-          <NavLink
-            key={index}
-            to={menu.path}
-            className={({ isActive }) =>
-              isActive ? "text-red-600 px-3" : "px-3"
-            }
-          >
-            <h2 className="cs-underline">{menu.name}</h2>
-          </NavLink>
-        ))}
-      </div>
-      </div>
+          <Link to={"/"} className="flex felx-row text-xl cursor-pointer">
+            <img src={logo1} alt="Logo" className="w-16" />
+            {/* <img src={logo2} alt="Logo" className="w-24 ml-10" /> */}
+          </Link>
+          <div className="sm:flex mt-2 text-gray-600 hidden shadow-gray-400 text-[13px] border border-gray-400 rounded-xl p-2 bg-white/30">
+            {menuList.map((menu, index) => (
+              <NavLink
+                key={index}
+                to={menu.path}
+                className={({ isActive }) =>
+                  isActive ? "text-red-600 px-3" : "px-3"
+                }
+              >
+                <h2 className="cs-underline">{menu.name}</h2>
+              </NavLink>
+            ))}
+          </div>
+        </div>
         <div className="w-[22rem]" ref={searchRef}>
           <div className="bg-white/60 px-4 py-2 flex border border-gray-400 items-center font-light gap-3 rounded-xl w-full shadow-sm">
             <RiSearchLine size={"20px"} color="#a4a4a4" />

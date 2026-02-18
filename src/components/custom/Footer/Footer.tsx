@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 // import Images from "@/assets";
-import logo1 from "/public/nexura-logo-1.png";
+const logo1 = "/nexura-logo-1.png";
 // Footer Data
 
 const footerMarketPlace = [
@@ -71,8 +71,8 @@ export default function Footer() {
   return (
     <footer
       className={`mt-auto border-t border-gray-200 ${navigation.pathname === "/login" || navigation.pathname === "/register"
-          ? "hidden"
-          : "block"
+        ? "hidden"
+        : "block"
         }`}
     >
       <div className="mx-auto flex flex-col items-center ">
