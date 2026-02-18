@@ -185,22 +185,22 @@ const Login = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-        className="relative z-10 w-full max-w-[440px] bg-white/[0.07] backdrop-blur-xl rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] border border-white/20 p-6 md:p-8 max-h-[96vh] flex flex-col justify-center"
+        className="relative z-10 w-full max-w-[440px] bg-white/[0.07] backdrop-blur-xl rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] border border-white/20 p-4 md:p-6 max-h-[96vh] flex flex-col justify-center"
       >
-        <div className="flex flex-col items-center mb-6">
+        <div className="flex flex-col items-center mb-1">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             whileHover={{ scale: 1.05 }}
-            className="mb-4 relative"
+            className="mb-1 relative"
           >
             <video
               src="/images/Image_Animation copy.webm"
               autoPlay
               muted
               playsInline
-              className="w-44 h-44 md:w-52 md:h-52 object-contain scale-[1.3] transform-gpu"
+              className="w-32 h-32 md:w-40 md:h-40 object-contain scale-[1.3] transform-gpu"
             />
           </motion.div>
           <motion.h1
@@ -224,7 +224,7 @@ const Login = () => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleLogin)}
-            className="space-y-4"
+            className="space-y-3"
           >
             <FormField
               control={form.control}
@@ -237,7 +237,7 @@ const Login = () => {
                       <Input
                         type="email"
                         placeholder="john@nexura.com"
-                        className="h-12 bg-white/5 border-white/10 focus:border-white/40 focus:bg-white/10 focus:ring-0 rounded-2xl transition-all font-semibold text-white placeholder:text-white/20"
+                        className="h-11 bg-white/5 border-white/10 focus:border-white/40 focus:bg-white/10 focus:ring-0 rounded-2xl transition-all font-semibold text-white placeholder:text-white/20"
                         {...field}
                       />
                     </motion.div>
@@ -259,7 +259,7 @@ const Login = () => {
                         <Input
                           type={showPassword ? "text" : "password"}
                           placeholder="••••••••"
-                          className="h-12 bg-white/5 border-white/10 focus:border-white/40 focus:bg-white/10 focus:ring-0 rounded-2xl pr-14 transition-all font-semibold text-white placeholder:text-white/20"
+                          className="h-11 bg-white/5 border-white/10 focus:border-white/40 focus:bg-white/10 focus:ring-0 rounded-2xl pr-14 transition-all font-semibold text-white placeholder:text-white/20"
                           {...field}
                         />
                       </motion.div>
@@ -280,12 +280,12 @@ const Login = () => {
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="pt-4"
+              className="pt-2"
             >
               <Button
                 disabled={loading}
                 type="submit"
-                className="w-full h-14 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-2xl font-black text-lg transition-all shadow-sm active:scale-[0.98] uppercase tracking-widest backdrop-blur-sm"
+                className="w-full h-12 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-2xl font-black text-lg transition-all shadow-sm active:scale-[0.98] uppercase tracking-widest backdrop-blur-sm"
               >
                 {loading ? (
                   <ReactLoading type="bars" height={28} width={28} color="#fff" />
@@ -295,7 +295,7 @@ const Login = () => {
               </Button>
             </motion.div>
 
-            <div className="relative my-4 text-center flex items-center justify-center gap-4">
+            <div className="relative my-2 text-center flex items-center justify-center gap-4">
               <div className="h-[1px] flex-1 bg-white/10"></div>
               <span className="text-white/30 text-[10px] font-black uppercase tracking-[0.4em]">Auth Service</span>
               <div className="h-[1px] flex-1 bg-white/10"></div>
@@ -311,7 +311,7 @@ const Login = () => {
                   type="button"
                   onClick={googleAuth}
                   variant="outline"
-                  className="w-full h-13 border border-white/10 bg-white/5 hover:bg-transparent rounded-2xl flex items-center justify-center gap-3 font-bold text-white transition-all shadow-sm text-sm"
+                  className="w-full h-11 border border-white/10 bg-white/5 hover:bg-transparent rounded-2xl flex items-center justify-center gap-3 font-bold text-white transition-all shadow-sm text-sm"
                 >
                   <FcGoogle size={20} />
                   <span className="uppercase tracking-[0.2em] text-[10px]">Continue with Google</span>
@@ -319,7 +319,7 @@ const Login = () => {
               </motion.div>
             </div>
 
-            <p className="text-center text-[10px] text-white/40 pt-4 font-bold uppercase tracking-widest leading-relaxed">
+            <p className="text-center text-[10px] text-white/40 pt-1 font-bold uppercase tracking-widest leading-relaxed">
               No account?{" "}
               <Link
                 to="/signup"
