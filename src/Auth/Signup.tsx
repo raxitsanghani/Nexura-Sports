@@ -10,7 +10,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Images from "@/assets";
+
 import ReactLoading from "react-loading";
 import {
   Form,
@@ -161,7 +161,7 @@ const Signup = () => {
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
         className="relative z-10 w-full max-w-[480px] bg-white/[0.07] backdrop-blur-xl rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] border border-white/20 p-5 md:p-7 max-h-[98vh] flex flex-col justify-center"
       >
-        <div className="flex flex-col items-center mb-4">
+        <div className="flex flex-col items-center mb-2">
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -169,10 +169,12 @@ const Signup = () => {
             whileHover={{ scale: 1.05 }}
             className="mb-2 relative"
           >
-            <img
-              src={Images.LOGO}
-              alt="Nexura Logo"
-              className="w-28 h-28 md:w-36 md:h-36 object-contain brightness-125 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]"
+            <video
+              src="/images/Image_Animation copy.webm"
+              autoPlay
+              muted
+              playsInline
+              className="w-44 h-44 md:w-52 md:h-52 object-contain scale-[1.3] transform-gpu"
             />
           </motion.div>
           <motion.h1
@@ -196,7 +198,7 @@ const Signup = () => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleSignup)}
-            className="space-y-2 md:space-y-3"
+            className="space-y-1 md:space-y-2"
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
@@ -326,7 +328,7 @@ const Signup = () => {
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="pt-3"
+              className="pt-2"
             >
               <Button
                 disabled={loading}
@@ -341,7 +343,7 @@ const Signup = () => {
               </Button>
             </motion.div>
 
-            <div className="relative my-3 text-center flex items-center justify-center gap-4">
+            <div className="relative my-2 text-center flex items-center justify-center gap-4">
               <div className="h-[1px] flex-1 bg-white/10"></div>
               <span className="text-white/30 text-[10px] font-black uppercase tracking-[0.4em]">Auth Service</span>
               <div className="h-[1px] flex-1 bg-white/10"></div>

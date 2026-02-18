@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/components/ui/use-toast";
-import Images from "@/assets";
+
 
 import {
   Form,
@@ -195,10 +195,12 @@ const Login = () => {
             whileHover={{ scale: 1.05 }}
             className="mb-4 relative"
           >
-            <img
-              src={Images.LOGO}
-              alt="Nexura Logo"
-              className="w-28 h-28 md:w-36 md:h-36 object-contain brightness-125 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]"
+            <video
+              src="/images/Image_Animation copy.webm"
+              autoPlay
+              muted
+              playsInline
+              className="w-44 h-44 md:w-52 md:h-52 object-contain scale-[1.3] transform-gpu"
             />
           </motion.div>
           <motion.h1
