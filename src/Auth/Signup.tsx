@@ -172,7 +172,7 @@ const Signup = () => {
             <img
               src={Images.LOGO}
               alt="Nexura Logo"
-              className="w-20 h-20 md:w-24 md:h-24 object-contain brightness-110 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+              className="w-28 h-28 md:w-36 md:h-36 object-contain brightness-125 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]"
             />
           </motion.div>
           <motion.h1

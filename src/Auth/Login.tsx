@@ -185,7 +185,7 @@ const Login = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-        className="relative z-10 w-full max-w-[440px] bg-white/[0.07] backdrop-blur-xl rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] border border-white/20 p-8 md:p-10 max-h-[95vh] flex flex-col justify-center"
+        className="relative z-10 w-full max-w-[440px] bg-white/[0.07] backdrop-blur-xl rounded-[2.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] border border-white/20 p-6 md:p-8 max-h-[96vh] flex flex-col justify-center"
       >
         <div className="flex flex-col items-center mb-6">
           <motion.div
@@ -198,7 +198,7 @@ const Login = () => {
             <img
               src={Images.LOGO}
               alt="Nexura Logo"
-              className="w-20 h-20 md:w-24 md:h-24 object-contain brightness-110 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+              className="w-28 h-28 md:w-36 md:h-36 object-contain brightness-125 drop-shadow-[0_0_30px_rgba(255,255,255,0.2)]"
             />
           </motion.div>
           <motion.h1
@@ -293,7 +293,7 @@ const Login = () => {
               </Button>
             </motion.div>
 
-            <div className="relative my-6 text-center flex items-center justify-center gap-4">
+            <div className="relative my-4 text-center flex items-center justify-center gap-4">
               <div className="h-[1px] flex-1 bg-white/10"></div>
               <span className="text-white/30 text-[10px] font-black uppercase tracking-[0.4em]">Auth Service</span>
               <div className="h-[1px] flex-1 bg-white/10"></div>
@@ -317,6 +317,16 @@ const Login = () => {
               </motion.div>
             </div>
 
+            <p className="text-center text-[10px] text-white/40 pt-4 font-bold uppercase tracking-widest leading-relaxed">
+              No account?{" "}
+              <Link
+                to="/signup"
+                className="text-white font-black hover:text-white/80 transition-all border-b border-white/20 hover:border-white pb-1 underline-offset-4"
+              >
+                Join Nexura
+              </Link>
+            </p>
+
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -330,16 +340,6 @@ const Login = () => {
                 Guest Checkout
               </Button>
             </motion.div>
-
-            <p className="text-center text-[10px] text-white/40 pt-4 font-bold uppercase tracking-widest">
-              No account?{" "}
-              <Link
-                to="/signup"
-                className="text-white font-black hover:text-white/80 transition-all border-b border-white/20 hover:border-white pb-1 underline-offset-4"
-              >
-                Join Nexura
-              </Link>
-            </p>
           </form>
         </Form>
       </motion.div>
