@@ -119,11 +119,13 @@ const OrdersList = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Confirmed': return "bg-green-100 text-green-800";
-      case 'In transit': return "bg-yellow-100 text-yellow-800";
+      case 'Pending': return "bg-blue-100 text-blue-800";
+      case 'Processing': return "bg-amber-100 text-amber-800";
+      case 'Confirmed': return "bg-indigo-100 text-indigo-800";
+      case 'Delivered': return "bg-green-100 text-green-800";
       case 'Cancelled': return "bg-red-100 text-red-800";
       case 'Cancellation Requested': return "bg-orange-100 text-orange-800";
-      default: return "bg-blue-100 text-blue-800";
+      default: return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -136,7 +138,7 @@ const OrdersList = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 relative">
+    <div className="container mx-auto px-4 py-8 relative font-satoshi">
       <Toaster />
 
       {/* Cancellation Modal */}
@@ -219,7 +221,7 @@ const OrdersList = () => {
                         {expandedOrderId === order.orderId ? 'Hide Details' : 'View Details'}
                       </button>
 
-                      {order.status !== "Cancelled" && order.status !== "Cancellation Requested" && (
+                      {(order.status === "Pending" || order.status === "Processing") && (
                         <button
                           type="button"
                           onClick={() => openCancelModal(order.orderId)}

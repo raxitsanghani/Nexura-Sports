@@ -235,7 +235,7 @@ const Checkout = () => {
           ...extraDetails,
           products: cartItems,
           timestamp: Timestamp.now(),
-          status: "Processing",
+          status: "Pending",
         };
 
         await setDoc(doc(db, "orders", orderId), orderData);

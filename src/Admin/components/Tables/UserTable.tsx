@@ -205,7 +205,7 @@ const UserRow: React.FC<UserRowProps> = ({ user, onBlock, onDelete }) => {
                               <tr key={order.id} className="hover:bg-slate-50 transition-colors">
                                 <td className="p-6">
                                   <p className="text-[11px] font-mono font-black text-slate-800">{order.orderId}</p>
-                                  <div className={`mt-1 text-[9px] font-black uppercase tracking-widest ${order.status === 'Confirmed' ? 'text-green-600' : 'text-amber-600'}`}>{order.status}</div>
+                                  <div className={`mt-1 text-[9px] font-black uppercase tracking-widest ${(order.status === 'Confirmed' || order.status === 'Delivered') ? 'text-green-600' : 'text-amber-600'}`}>{order.status}</div>
                                 </td>
                                 <td className="p-6 text-xs font-bold text-slate-500">{order.date}</td>
                                 <td className="p-6">

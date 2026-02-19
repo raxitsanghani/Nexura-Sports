@@ -43,9 +43,9 @@ const OrderTracking = () => {
     const getStepStatus = (status: string, step: number) => {
         // 1: Processing, 2: Confirmed, 3: Shipped, 4: Delivered
         const statusMap: Record<string, number> = {
-            "Processing": 1,
-            "Confirmed": 2,
-            "In transit": 3,
+            "Pending": 1,
+            "Processing": 2,
+            "Confirmed": 3,
             "Delivered": 4,
             "Cancelled": 0
         };
@@ -109,9 +109,9 @@ const OrderTracking = () => {
 
                                     {/* Steps */}
                                     {[
-                                        { id: 1, label: "Processing", icon: FaBox },
-                                        { id: 2, label: "Confirmed", icon: FaCheck },
-                                        { id: 3, label: "Shipped", icon: FaTruck },
+                                        { id: 1, label: "Pending", icon: FaBox },
+                                        { id: 2, label: "Processing", icon: FaTruck },
+                                        { id: 3, label: "Confirmed", icon: FaCheck },
                                         { id: 4, label: "Delivered", icon: FaHome }
                                     ].map((step) => {
                                         const status = getStepStatus(order.status, step.id);

@@ -36,7 +36,7 @@ const Orders = () => {
           timestamp: data.timestamp?.toDate ? data.timestamp.toDate().toDateString() : (data.date || new Date().toDateString()),
           rawTimestamp: data.timestamp,
           userId: data.userId || "", // Ensure userId exists
-          status: data.status || "Processing"
+          status: data.status || "Pending"
         } as unknown as Order & { rawTimestamp?: { seconds: number } };
       });
 
@@ -100,7 +100,7 @@ const Orders = () => {
         ), { duration: 2000 });
       } else {
         await updateDoc(doc(db, "orders", orderId), {
-          status: "Processing",
+          status: "Pending",
           cancellationReason: null // Optional: clear reason
         });
         toast.custom((t) => (

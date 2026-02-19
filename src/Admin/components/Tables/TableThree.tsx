@@ -65,36 +65,41 @@ const OrderRow: React.FC<OrderRowProps> = ({
 
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case "Pre-order":
-      case "Processing":
+      case "Pending":
         return {
-          color: "bg-amber-100 text-amber-700 border-amber-200/50",
+          color: "bg-blue-100 text-blue-700 border-blue-200/50",
           icon: <CgSandClock className="w-3.5 h-3.5" />,
           label: "Pending"
         };
-      case "In transit":
+      case "Processing":
         return {
-          color: "bg-blue-100 text-blue-700 border-blue-200/50",
-          icon: <FiTruck className="w-3.5 h-3.5" />,
-          label: "Moving"
+          color: "bg-amber-100 text-amber-700 border-amber-200/50",
+          icon: <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }}><CgSandClock className="w-3.5 h-3.5" /></motion.div>,
+          label: "Processing"
         };
       case "Confirmed":
         return {
-          color: "bg-green-100 text-green-700 border-green-200/50",
+          color: "bg-indigo-100 text-indigo-700 border-indigo-200/50",
           icon: <IoCheckmarkSharp className="w-3.5 h-3.5" />,
-          label: "Success"
+          label: "Confirmed"
+        };
+      case "Delivered":
+        return {
+          color: "bg-green-100 text-green-700 border-green-200/50",
+          icon: <FiTruck className="w-3.5 h-3.5" />,
+          label: "Delivered"
         };
       case "Cancelled":
         return {
           color: "bg-rose-100 text-rose-700 border-rose-200/50",
           icon: <RxCross2 className="w-3.5 h-3.5" />,
-          label: "Failed"
+          label: "Cancelled"
         };
       case "Cancellation Requested":
         return {
           color: "bg-orange-100 text-orange-700 border-orange-200/50",
           icon: <FiAlertCircle className="w-3.5 h-3.5" />,
-          label: "Warning"
+          label: "Requested"
         };
       default:
         return { color: "bg-slate-100 text-slate-700", icon: null, label: status };
@@ -213,10 +218,11 @@ const OrderRow: React.FC<OrderRowProps> = ({
                     onChange={(e) => setStatusUpdate(e.target.value)}
                     className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-bold text-slate-600 focus:border-green-500 focus:outline-none focus:ring-4 focus:ring-green-500/10 transition-all appearance-none pr-8 relative bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2210%22%20height%3D%226%22%20viewBox%3D%220%200%2010%206%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M1%201L5%205L9%201%22%20stroke%3D%22%2364748B%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22/%3E%3C/svg%3E')] bg-[length:10px_6px] bg-[right_0.8rem_center] bg-no-repeat"
                   >
+                    <option value="Pending">Pending</option>
                     <option value="Processing">Processing</option>
-                    <option value="In transit">Moving</option>
-                    <option value="Confirmed">Success</option>
-                    <option value="Cancelled">Failed</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
                   </select>
                   <button onClick={() => { if (statusUpdate) { onUpdateStatus(order.userId, order.orderId, statusUpdate); setStatusUpdate(undefined); } }} className="bg-green-600 text-white px-4 py-1.5 rounded-xl shadow-lg shadow-green-100 hover:shadow-green-200 transition-all active:scale-95 text-[11px] font-black uppercase tracking-wider disabled:opacity-50" disabled={!statusUpdate}>Save</button>
                 </div>
