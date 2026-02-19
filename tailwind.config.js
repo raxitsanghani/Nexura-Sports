@@ -21,7 +21,7 @@ module.exports = {
 		extend: {
 			fontFamily: {
 				satoshi: [
-					'Your Satoshi Font Family',
+					'Satoshi',
 					'sans-serif'
 				]
 			},

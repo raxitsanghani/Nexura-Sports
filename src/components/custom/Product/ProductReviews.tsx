@@ -179,11 +179,11 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                     reviewerEmail: userEmail,
                     date: new Date().toISOString().split("T")[0] + " (Edited)",
                 };
-                toast({ description: "Review updated successfully!" });
+                toast({ variant: "success", description: "Review updated successfully!" });
             } else {
                 // Add new review
                 updatedReviews.unshift(reviewData);
-                toast({ description: "Review submitted successfully!" });
+                toast({ variant: "success", description: "Review submitted successfully!" });
             }
 
             const updatedRatings = recalculateRatings(updatedReviews);
@@ -255,7 +255,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
         try {
             const updatedRatings = recalculateRatings(updatedReviews);
             await updateFirestoreReviews(updatedReviews, updatedRatings);
-            toast({ description: "Review deleted." });
+            toast({ variant: "success", description: "Review deleted." });
         } catch (error) {
             toast({ description: "Failed to delete review", variant: "destructive" });
         }
@@ -281,7 +281,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({
                     // Fallback to current user state if owner
                     // Finally fallback to review snapshot data
                     const syncedProfile = review.userId ? userProfiles[review.userId] : null;
-                    
+
                     const displayPhoto = syncedProfile?.photoUrl || (isOwner ? userPhoto : review.reviewerPhoto);
                     const displayName = syncedProfile?.name || (isOwner ? userName : review.reviewerName);
 

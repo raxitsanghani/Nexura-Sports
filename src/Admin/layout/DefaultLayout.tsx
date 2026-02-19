@@ -5,7 +5,7 @@ const DefaultLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="bg-gray-50 dark:bg-boxdark-2 dark:text-bodydark font-satoshi text-base">
+    <div className="admin-panel-client bg-[#f8fafc] font-satoshi text-slate-800 antialiased">
       {/* <!-- ===== Page Wrapper Start ===== --> */}
       <div className="flex h-screen overflow-hidden">
         {/* <!-- ===== Sidebar Start ===== --> */}

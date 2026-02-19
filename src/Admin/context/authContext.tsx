@@ -12,8 +12,8 @@ interface AuthContextType {
 // Create AuthContext with default values
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
-  login: () => {},
-  logout: () => {},
+  login: () => { },
+  logout: () => { },
 });
 
 // AuthProvider component

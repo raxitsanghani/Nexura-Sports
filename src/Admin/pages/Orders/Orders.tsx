@@ -30,6 +30,8 @@ const Orders = () => {
           key: doc.id,
           orderId: data.orderId || doc.id,
           userName: data.address?.name || "Unknown",
+          // Price Handling
+          price: Number(data.price) || Number(data.total) || 0,
           // Timestamp handling
           timestamp: data.timestamp?.toDate ? data.timestamp.toDate().toDateString() : (data.date || new Date().toDateString()),
           rawTimestamp: data.timestamp,
@@ -40,8 +42,8 @@ const Orders = () => {
 
       // Sort Newest First (Client-side fallback)
       fetchedOrders.sort((a, b) => {
-        const timeA = a.rawTimestamp?.seconds || 0;
-        const timeB = b.rawTimestamp?.seconds || 0;
+        const timeA = (a.rawTimestamp?.seconds || 0);
+        const timeB = (b.rawTimestamp?.seconds || 0);
         return timeB - timeA;
       });
 

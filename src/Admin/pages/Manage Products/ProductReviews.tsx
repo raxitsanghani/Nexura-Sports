@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { db } from "@/Database/firebase";
 import { collection, getDocs, doc, updateDoc } from "firebase/firestore";
 import { Product, Review } from "@/types";
-import { Rating } from "react-simple-star-rating";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -54,7 +53,6 @@ const ProductReviews = () => {
                 reviews: updatedReviews,
             });
 
-            // Update local state by creating a new array reference
             const updatedProducts = ratedProducts
                 .map((p) => {
                     if (p.id === productId) {
@@ -62,7 +60,7 @@ const ProductReviews = () => {
                     }
                     return p;
                 })
-                .filter((p) => p.reviews.length > 0); // Optionally remove product if no reviews left, or keep it. keeping for now if 0 reviews? user said "all products that have at least one rating". So if 0, maybe remove.
+                .filter((p) => p.reviews.length > 0);
 
             setRatedProducts(updatedProducts);
             toast.success("Review deleted successfully!");
@@ -74,85 +72,83 @@ const ProductReviews = () => {
     };
 
     return (
-        <div className="container mx-auto p-6 max-w-7xl">
+        <div className="max-w-7xl mx-auto space-y-12 pb-20">
             <ToastContainer position="top-right" autoClose={3000} />
-            <h1 className="text-3xl font-bold text-center mb-8 text-black">Product Reviews</h1>
+            <div className="flex flex-col gap-2 text-center mb-12">
+                <h2 className="text-4xl font-black tracking-tight text-slate-900">Feedback Intelligence</h2>
+                <p className="text-sm font-bold text-slate-400 uppercase tracking-[0.3em]">Consumer Sentiment Analysis</p>
+            </div>
 
             {ratedProducts.length === 0 ? (
-                <div className="text-center py-12">
-                    <p className="text-gray-500 text-lg">No reviews found.</p>
+                <div className="bg-white rounded-[2.5rem] p-20 border border-slate-100 text-center shadow-[0_20px_50px_rgba(0,0,0,0.02)]">
+                    <div className="text-4xl mb-4">🔇</div>
+                    <p className="text-slate-400 font-black uppercase tracking-[0.2em] text-xs">No feedback records detected in global archive</p>
                 </div>
             ) : (
-                <div className="space-y-8">
+                <div className="space-y-16">
                     {ratedProducts.map((product) => (
-                        <div key={product.id} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                            {/* Product Header */}
-                            <div className="flex items-center gap-4 p-4 bg-gray-50 border-b border-gray-100">
-                                <img
-                                    src={product.defaultImage}
-                                    alt={product.name}
-                                    className="w-12 h-12 object-cover rounded-lg border border-gray-200"
-                                />
+                        <div key={product.id} className="space-y-8">
+                            <div className="flex items-center gap-6 pb-6 border-b border-slate-100 ml-4">
+                                <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-xl shadow-slate-200 border border-white">
+                                    <img
+                                        src={product.defaultImage}
+                                        alt={product.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
                                 <div>
-                                    <h3 className="text-lg font-bold text-gray-800">{product.name}</h3>
-                                    <p className="text-sm text-gray-500">
-                                        Total Reviews: <span className="font-semibold text-gray-700">{product.reviews.length}</span>
-                                    </p>
+                                    <h3 className="text-xl font-black text-slate-900 tracking-tight">{product.name}</h3>
+                                    <div className="flex items-center gap-3 mt-1">
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Registry ID: {product.id.slice(0, 8)}...</span>
+                                        <div className="w-1 h-1 rounded-full bg-slate-200"></div>
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-green-500">{product.reviews.length} Validated Reviews</span>
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Reviews Grid */}
-                            <div className="p-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {product.reviews.map((review, index) => (
                                     <div
                                         key={index}
-                                        className="flex flex-col h-full bg-white border border-gray-100 rounded-xl p-4 hover:shadow-md transition-shadow duration-200"
+                                        className="group bg-white rounded-[2rem] p-8 border border-slate-50 shadow-[0_10px_40px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.05)] hover:-translate-y-1 transition-all duration-500 flex flex-col justify-between"
                                     >
-                                        {/* 1. User Info */}
-                                        <div className="flex items-center gap-3 mb-3">
-                                            <div className="flex-shrink-0">
-                                                {review.reviewerPhoto ? (
-                                                    <img
-                                                        src={review.reviewerPhoto}
-                                                        alt={review.reviewerName}
-                                                        className="w-10 h-10 rounded-full object-cover border border-gray-100"
-                                                    />
-                                                ) : (
-                                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-500 font-bold text-sm">
-                                                        {review.reviewerName?.charAt(0).toUpperCase() || "U"}
+                                        <div className="space-y-6">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded-xl overflow-hidden ring-4 ring-slate-50/50">
+                                                        {review.reviewerPhoto ? (
+                                                            <img
+                                                                src={review.reviewerPhoto}
+                                                                alt={review.reviewerName}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400 font-black text-xs">
+                                                                {review.reviewerName?.charAt(0).toUpperCase() || "U"}
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                )}
+                                                    <div>
+                                                        <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider truncate max-w-[120px]">{review.reviewerName || "Anonymous"}</h4>
+                                                        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.1em]">{review.date}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="bg-amber-50/80 px-2.5 py-1 rounded-full flex items-center gap-1">
+                                                    <span className="text-[9px] font-black text-amber-600">{review.rating}</span>
+                                                    <span className="text-[10px]">⭐</span>
+                                                </div>
                                             </div>
-                                            <div className="min-w-0">
-                                                <h4 className="font-bold text-gray-900 text-sm truncate">{review.reviewerName || "Anonymous"}</h4>
-                                                <p className="text-xs text-gray-400">{review.date}</p>
-                                            </div>
-                                        </div>
 
-                                        {/* 2. Review Text */}
-                                        <div className="mb-4 flex-grow">
-                                            <p className="text-gray-600 text-sm leading-relaxed">
+                                            <p className="text-sm font-medium text-slate-600 leading-relaxed italic border-l-2 border-slate-100 pl-4 py-2">
                                                 "{review.reviewText}"
                                             </p>
                                         </div>
 
-                                        {/* 3. Star Rating */}
-                                        <div className="mb-4">
-                                            <Rating
-                                                readonly
-                                                initialValue={review.rating}
-                                                size={18}
-                                                allowFraction={true}
-                                                SVGstyle={{ display: "inline-block" }}
-                                            />
-                                        </div>
-
-                                        {/* 4. Delete Button (Bottom) */}
                                         <button
                                             onClick={() => handleDeleteReview(product.id, index)}
-                                            className="w-full mt-auto bg-red-50 text-red-600 py-2.5 rounded-lg text-xs font-bold hover:bg-red-100 hover:text-red-700 transition-all active:scale-95"
+                                            className="w-full mt-8 bg-slate-50 text-rose-500 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-rose-500 hover:text-white transition-all transform active:scale-95 opacity-0 group-hover:opacity-100"
                                         >
-                                            Delete Review
+                                            Purge Feedback
                                         </button>
                                     </div>
                                 ))}

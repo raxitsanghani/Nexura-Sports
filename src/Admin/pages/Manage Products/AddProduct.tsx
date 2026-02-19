@@ -40,7 +40,6 @@ const AddProduct = () => {
         ...prev,
         [color]: [...(prev[color] || []), ...newFiles]
       }));
-
       const newPreviewUrls = newFiles.map(file => URL.createObjectURL(file));
       setImagePreviews((prev) => ({
         ...prev,
@@ -72,7 +71,6 @@ const AddProduct = () => {
     });
     setImagePreviews((prev) => {
       const newPreviews = { ...prev };
-      // Revoke URLs to prevent memory leaks
       if (newPreviews[colorToRemove]) {
         newPreviews[colorToRemove].forEach((url) => URL.revokeObjectURL(url));
       }
@@ -85,7 +83,6 @@ const AddProduct = () => {
     if (e.target.files) {
       const newFiles = Array.from(e.target.files);
       setDefaultImageFiles((prev) => [...prev, ...newFiles]);
-
       const newPreviewUrls = newFiles.map(file => URL.createObjectURL(file));
       setDefaultImagePreviews((prev) => [...prev, ...newPreviewUrls]);
     }
@@ -114,48 +111,35 @@ const AddProduct = () => {
       const categoriesArray = categories.split(",").map((item) => item.trim().toLowerCase()).filter(item => item !== "");
       const featuresArray = features.split(",").map((item) => item.trim()).filter(item => item !== "");
       const sizesArray = sizes.split(",").map((item) => item.trim()).filter(item => item !== "");
-
-      // Record<colorName, [urls]>
       const imageUrlsArray: Record<string, string[]> = {};
       let primaryDefaultImageUrl = "";
 
-      // 1. Upload default images (Sequential)
       if (defaultImageFiles.length > 0) {
         const defaultImageUrls: string[] = [];
         for (const file of defaultImageFiles) {
           const sanitizedName = name.replace(/[^a-zA-Z0-9]/g, "_");
           const sanitizedFileName = file.name.replace(/\s+/g, "_");
           const timestamp = Date.now();
-          const defaultImageRef = ref(
-            storage,
-            `shoes/${sanitizedName}/default/${timestamp}_${sanitizedFileName}`
-          );
+          const defaultImageRef = ref(storage, `shoes/${sanitizedName}/default/${timestamp}_${sanitizedFileName}`);
           await uploadBytes(defaultImageRef, file);
           const url = await getDownloadURL(defaultImageRef);
           defaultImageUrls.push(url);
         }
-
         if (defaultImageUrls.length > 0) {
           primaryDefaultImageUrl = defaultImageUrls[0];
           imageUrlsArray["default"] = defaultImageUrls;
         }
       }
 
-      // 2. Upload Color Bundle Images (Sequential)
-      // We iterate one by one to avoid rate-limiting issues or concurrency bugs with large batches
       for (const color of colors) {
         if (imageFiles[color] && imageFiles[color].length > 0) {
           const uploadedUrls: string[] = [];
-
           for (const file of imageFiles[color]) {
             const sanitizedName = name.replace(/[^a-zA-Z0-9]/g, "_");
-            // Sanitize color to avoid deep nested folder issues if color has slashes like "Black/Yamabuki"
             const sanitizedColor = color.replace(/[^a-zA-Z0-9]/g, "_");
             const sanitizedFileName = file.name.replace(/\s+/g, "_");
-            const timestamp = Date.now(); // Ensure unique path even if filenames are same
-
+            const timestamp = Date.now();
             const imageRef = ref(storage, `shoes/${sanitizedName}/${sanitizedColor}/${timestamp}_${sanitizedFileName}`);
-
             await uploadBytes(imageRef, file);
             const url = await getDownloadURL(imageRef);
             uploadedUrls.push(url);
@@ -166,7 +150,6 @@ const AddProduct = () => {
         }
       }
 
-      // Fallback: If no default image set, use the first available color image
       if (!primaryDefaultImageUrl) {
         for (const color of colors) {
           if (imageUrlsArray[color] && imageUrlsArray[color].length > 0) {
@@ -188,17 +171,17 @@ const AddProduct = () => {
         defaultImage: primaryDefaultImageUrl,
         sizes: sizesArray,
         details: details,
-        rating: {}, // Initialize with empty rating
-        reviews: [], // Initialize with empty reviews
+        rating: {},
+        reviews: [],
         createdAt: new Date().toISOString(),
       });
 
       toast({
-        title: "Product Added",
-        description: `${name} has been successfully added.`,
+        variant: "success",
+        title: "Asset Deployed",
+        description: `${name} has been successfully registered.`,
       });
 
-      // Reset form
       setName("");
       setPrice("");
       setCategories("");
@@ -212,199 +195,161 @@ const AddProduct = () => {
       setDefaultColorName("");
       setDefaultImageFiles([]);
       setDefaultImagePreviews([]);
-
     } catch (error) {
-      console.error("Error adding document: ", error);
+      console.error(error);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to add product. Please try again.",
+        title: "Deployment Failed",
+        description: "Encountered a critical error during registration.",
       });
     } finally {
       setLoading(false);
     }
   };
 
+  const inputClass = "w-full bg-white border border-slate-200 rounded-[1.5rem] px-6 py-4 text-sm font-bold text-slate-700 focus:outline-none focus:ring-4 focus:ring-green-500/10 focus:border-green-500 transition-all placeholder:text-slate-300 placeholder:font-medium";
+  const labelClass = "block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 ml-2";
+
   return (
-    <div className="container mx-auto p-6 bg-white rounded shadow-md">
-      <h1 className="text-3xl font-bold text-center mb-6">Add New Product</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-gray-700 font-semibold">Name</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-            required
-          />
+    <div className="max-w-5xl mx-auto space-y-12 pb-20 font-satoshi">
+      <div className="flex flex-col gap-2 text-center">
+        <h2 className="text-5xl font-black tracking-tighter text-slate-900">Deploy New Asset</h2>
+        <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.5em] ml-1">Registration Terminal</p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-10">
+        {/* Core Identity Section */}
+        <div className="bg-white rounded-[2.5rem] p-10 shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-slate-50">
+          <div className="flex items-center gap-3 mb-10 pb-5 border-b border-slate-50">
+            <div className="w-1.5 h-6 bg-green-500 rounded-full"></div>
+            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-800">Asset Identity</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-2">
+              <label className={labelClass}>Product Designation</label>
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} className={inputClass} placeholder="e.g. Air Force 1 '07 Premium" required />
+            </div>
+            <div className="space-y-2">
+              <label className={labelClass}>Market Value (INR)</label>
+              <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} className={inputClass} placeholder="e.g. 9999" required />
+            </div>
+            <div className="space-y-2">
+              <label className={labelClass}>Category Tags (CSV)</label>
+              <input type="text" value={categories} onChange={(e) => setCategories(e.target.value)} className={inputClass} placeholder="e.g. Lifestyle, Basketball, Men" />
+            </div>
+            <div className="space-y-2">
+              <label className={labelClass}>Market Rebate (%)</label>
+              <input type="text" value={discount} onChange={(e) => setDiscount(e.target.value)} className={inputClass} placeholder="e.g. 15% OFF" />
+            </div>
+          </div>
         </div>
-        <div>
-          <label className="block text-gray-700 font-semibold">Price</label>
-          <input
-            type="number"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-gray-700 font-semibold">
-            Categories (comma separated)
-          </label>
-          <input
-            type="text"
-            value={categories}
-            onChange={(e) => setCategories(e.target.value)}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-          />
-        </div>
-        <div className="space-y-4">
-          <div className="flex items-center gap-4">
-            <label className="block text-gray-700 font-semibold text-lg">
-              Default Images (Angles)
-            </label>
-            <input
-              type="text"
-              placeholder="Primary Color Name (e.g. Green)"
-              value={defaultColorName}
-              onChange={(e) => setDefaultColorName(e.target.value)}
-              className="p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300 w-64"
-            />
-            <button
-              type="button"
-              onClick={handleAddColor}
-              className="w-10 h-10 flex items-center justify-center bg-black text-white rounded-full hover:bg-gray-800 hover:scale-110 active:scale-90 transition-all shadow-md text-xl font-bold"
-              title="Add another color"
-            >
-              +
+
+        {/* Visual Assets Section */}
+        <div className="bg-white rounded-[2.5rem] p-10 shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-slate-50">
+          <div className="flex items-center justify-between mb-10 pb-5 border-b border-slate-50">
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-6 bg-blue-500 rounded-full"></div>
+              <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-800">Visual Repository</h3>
+            </div>
+            <button type="button" onClick={handleAddColor} className="bg-slate-900 text-white px-6 py-3 rounded-2xl font-black uppercase tracking-[0.2em] text-[9px] hover:bg-black active:scale-95 transition-all shadow-xl shadow-slate-100">
+              Establish Bundle
             </button>
           </div>
 
-          <div className="p-4 border rounded-md bg-gray-50">
-            <input
-              type="file"
-              multiple
-              onChange={handleDefaultImageChange}
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300 bg-white"
-            />
-            {defaultImagePreviews.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2 p-2 bg-white rounded-md border">
-                {defaultImagePreviews.map((url, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={url}
-                      alt={`Default Preview ${index}`}
-                      className="w-24 h-24 object-cover rounded shadow-sm border border-gray-200"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveDefaultImage(index)}
-                      className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md hover:scale-110 active:scale-90 cursor-pointer"
-                    >
-                      ×
-                    </button>
+          <div className="space-y-12">
+            {/* Primary / Default Bundle */}
+            <div className="p-8 rounded-[2rem] bg-slate-50/50 border border-slate-100">
+              <div className="flex flex-col md:flex-row gap-6 mb-8">
+                <div className="flex-1">
+                  <label className={labelClass}>Primary Color Name</label>
+                  <input type="text" value={defaultColorName} onChange={(e) => setDefaultColorName(e.target.value)} className={inputClass} placeholder="e.g. Triple White" />
+                </div>
+                <div className="flex-1">
+                  <label className={labelClass}>Upload Master Angles</label>
+                  <div className="relative overflow-hidden group">
+                    <input type="file" multiple onChange={handleDefaultImageChange} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
+                    <div className="bg-white border-2 border-dashed border-slate-200 rounded-[1.5rem] px-6 py-4 text-sm font-bold text-slate-400 group-hover:border-blue-400 group-hover:text-blue-500 transition-all text-center">
+                      Drop assets or click to browse
+                    </div>
                   </div>
-                ))}
+                </div>
               </div>
-            )}
-          </div>
-        </div>
 
-        {colors.map((color) => (
-          <div key={color} className="space-y-2 mt-6 relative border p-4 rounded-md">
-            <div className="flex justify-between items-center mb-2">
-              <label className="block text-gray-700 font-semibold text-lg">
-                Images for Color: <span className="text-black font-bold">{color}</span>
-              </label>
-              <button
-                type="button"
-                onClick={() => handleRemoveColor(color)}
-                className="text-red-500 hover:text-red-700 font-medium hover:underline transition-colors"
-              >
-                Remove Color
-              </button>
+              {defaultImagePreviews.length > 0 && (
+                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4">
+                  {defaultImagePreviews.map((url, index) => (
+                    <div key={index} className="relative group aspect-square">
+                      <img src={url} className="w-full h-full object-cover rounded-2xl border border-slate-200 shadow-sm" />
+                      <button type="button" onClick={() => handleRemoveDefaultImage(index)} className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-110 active:scale-90">×</button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            <input
-              type="file"
-              multiple
-              onChange={(e) => handleFileChange(color, e.target.files)}
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-            />
-            {imagePreviews[color] && imagePreviews[color].length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2 p-2 bg-gray-50 rounded-md border">
-                {imagePreviews[color].map((url, index) => (
-                  <div key={index} className="relative group">
-                    <img
-                      src={url}
-                      alt={`Preview ${index}`}
-                      className="w-20 h-20 object-cover rounded shadow-sm border border-gray-200"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveImage(color, index)}
-                      className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md hover:scale-110 active:scale-90 cursor-pointer"
-                    >
-                      ×
-                    </button>
+            {/* Dynamic Color Bundles */}
+            {colors.map((color) => (
+              <div key={color} className="p-8 rounded-[2rem] bg-white border border-slate-100 shadow-sm relative overflow-hidden">
+                <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-50">
+                  <p className="text-xs font-black text-slate-800 uppercase tracking-widest px-4 py-2 bg-slate-100 rounded-full">Variant: {color}</p>
+                  <button type="button" onClick={() => handleRemoveColor(color)} className="text-[10px] font-black uppercase text-rose-500 hover:underline">Decommission Bundle</button>
+                </div>
+
+                <div className="relative overflow-hidden group mb-8">
+                  <input type="file" multiple onChange={(e) => handleFileChange(color, e.target.files)} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
+                  <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-[1.5rem] px-6 py-10 text-sm font-bold text-slate-400 group-hover:border-slate-400 group-hover:text-slate-600 transition-all text-center flex flex-col items-center gap-2">
+                    <span className="text-2xl">📸</span>
+                    Upload images for {color} variant
                   </div>
-                ))}
+                </div>
+
+                {imagePreviews[color] && imagePreviews[color].length > 0 && (
+                  <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4">
+                    {imagePreviews[color].map((url, index) => (
+                      <div key={index} className="relative group aspect-square">
+                        <img src={url} className="w-full h-full object-cover rounded-2xl border border-slate-200" />
+                        <button type="button" onClick={() => handleRemoveImage(color, index)} className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-6 h-6 flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all">×</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
+            ))}
           </div>
-        ))}
-        <div>
-          <label className="block text-gray-700 font-semibold">Discount</label>
-          <input
-            type="text"
-            value={discount}
-            onChange={(e) => setDiscount(e.target.value)}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-          />
         </div>
-        <div>
-          <label className="block text-gray-700 font-semibold">
-            Features (comma separated)
-          </label>
-          <input
-            type="text"
-            value={features}
-            onChange={(e) => setFeatures(e.target.value)}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-          />
+
+        {/* Technical Specs Section */}
+        <div className="bg-white rounded-[2.5rem] p-10 shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-slate-50">
+          <div className="flex items-center gap-3 mb-10 pb-5 border-b border-slate-50">
+            <div className="w-1.5 h-6 bg-amber-500 rounded-full"></div>
+            <h3 className="text-xs font-black uppercase tracking-[0.3em] text-slate-800">Technical Specs</h3>
+          </div>
+
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <label className={labelClass}>Core Features (CSV)</label>
+                <input type="text" value={features} onChange={(e) => setFeatures(e.target.value)} className={inputClass} placeholder="e.g. Leather Upper, Air Cushioning" />
+              </div>
+              <div className="space-y-2">
+                <label className={labelClass}>Available Size Matrix (CSV)</label>
+                <input type="text" value={sizes} onChange={(e) => setSizes(e.target.value)} className={inputClass} placeholder="e.g. 7, 8, 9, 10, 11" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className={labelClass}>Asset Description & Logistical Notes</label>
+              <textarea value={details} onChange={(e) => setDetails(e.target.value)} className={`${inputClass} min-h-[150px] resize-none`} placeholder="Detailed product narrative..." />
+            </div>
+          </div>
         </div>
-        <div>
-          <label className="block text-gray-700 font-semibold">
-            Sizes (comma separated)
-          </label>
-          <input
-            type="text"
-            value={sizes}
-            onChange={(e) => setSizes(e.target.value)}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-          />
-        </div>
-        <div>
-          <label className="block text-gray-700 font-semibold">
-            Product Details
-          </label>
-          <textarea
-            value={details}
-            onChange={(e) => setDetails(e.target.value)}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-            rows={4}
-            placeholder="Enter product details like material, comfort, etc."
-          />
-        </div>
+
         <button
           type="submit"
           disabled={loading}
-          className={`w-full px-6 py-4 text-white font-bold rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-1 active:scale-95 ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-900"
-            }`}
+          className={`w-full py-6 rounded-[2rem] font-black uppercase tracking-[0.4em] text-sm transition-all shadow-xl active:scale-95 ${loading ? "bg-slate-200 text-slate-400 cursor-not-allowed" : "bg-green-600 text-white hover:bg-slate-900 shadow-green-100 hover:shadow-slate-200 hover:-translate-y-1"}`}
         >
-          {loading ? "Adding Product..." : "Add Product"}
+          {loading ? "Establishing Connection..." : "Finalize Deployment"}
         </button>
       </form>
     </div>

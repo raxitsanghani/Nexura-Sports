@@ -52,7 +52,7 @@ const Login = () => {
     setLoading(true);
     if (user.email === "raxitsanghani21@gmail.com" && user.password === "raxit2112") {
       localStorage.setItem("authToken", "admin-token");
-      toast({ description: "Admin Login Success!" });
+      toast({ variant: "success", description: "Admin Login Success!" });
       setLoading(false);
       window.location.href = "/admin";
       return;
@@ -68,7 +68,7 @@ const Login = () => {
           throw new Error("Your account has been blocked by the administrator.");
         }
 
-        toast({ description: "Login Success!" });
+        toast({ variant: "success", description: "Login Success!" });
         form.reset();
         setLoading(false);
         navigate("/");
@@ -147,7 +147,7 @@ const Login = () => {
           }
 
           createDoc(user);
-          toast({ description: "Login Success!" });
+          toast({ variant: "success", description: "Login Success!" });
           navigate("/");
           setLoading(false);
         })

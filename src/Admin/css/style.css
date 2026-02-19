@@ -1,7 +1,8 @@
-/* Font Families */
-@font-face {
-  font-family: 'Satoshi';
-  src: url('path-to-your-font/Satoshi.woff2') format('woff2');
+/* Font Families are managed in satoshi.css */
+
+.admin-panel-client,
+.admin-panel-client * {
+  font-family: 'Satoshi', sans-serif !important;
 }
 
 /* Background Colors */

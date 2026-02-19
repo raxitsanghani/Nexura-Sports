@@ -8,15 +8,12 @@ import {
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
-import { RxCross1 } from "react-icons/rx";
-
-// Define types for product properties
 import { Product } from "@/types";
-import { Rating } from "react-simple-star-rating";
+import { useToast } from "@/components/ui/use-toast";
 
 const EditProduct: React.FC = () => {
+  const { toast } = useToast();
   const { productId } = useParams<{ productId: string }>();
-  // const navigate = useNavigate();
   const [name, setName] = useState<string>("");
   const [price, setPrice] = useState<string>("");
   const [categories, setCategories] = useState<string>("");
@@ -26,16 +23,13 @@ const EditProduct: React.FC = () => {
   const [features, setFeatures] = useState<string>("");
   const [imageFiles, setImageFiles] = useState<Record<string, File[]>>({});
   const [sizes, setSizes] = useState<string>("");
-  // State for multiple default images
   const [defaultImageFiles, setDefaultImageFiles] = useState<File[]>([]);
-  // Store default images as string array for consistency with backend
   const [defaultImageUrls, setDefaultImageUrls] = useState<string[]>([]);
-
   const [defaultColorName, setDefaultColorName] = useState<string>("");
   const [details, setDetails] = useState<string>("");
   const [imageUrls, setImageUrls] = useState<Record<string, string[]>>({});
-  // @ts-ignore
   const [productReviews, setProductReviews] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -46,7 +40,6 @@ const EditProduct: React.FC = () => {
           const productData = productDoc.data() as Product;
           setName(productData.name);
           setPrice(productData.price ? productData.price.toString() : "");
-          // Handle potential missing fields or different formats
           setCategories(Array.isArray(productData.categories) ? productData.categories.join(", ") : "");
           setColors(productData.colors || []);
           setDiscount(productData.discount || "");
@@ -54,36 +47,26 @@ const EditProduct: React.FC = () => {
           setSizes(Array.isArray(productData.sizes) ? productData.sizes.join(", ") : "");
           setDetails(productData.details || "");
           setDefaultColorName(productData.defaultColorName || "");
-
-          // Handle default images normalization (string vs array)
           let defImgs: string[] = [];
-          // @ts-ignore checking specifically for potential array format in existing data or legacy string
           if (Array.isArray(productData.defaultImage)) {
-            // @ts-ignore
             defImgs = productData.defaultImage;
-            // Check if 'default' key in imageUrls also has images that should be considered default
             if (productData.imageUrls && productData.imageUrls["default"]) {
-              // Merge unique
               const set = new Set([...defImgs, ...productData.imageUrls["default"]]);
               defImgs = Array.from(set);
             }
           } else if (typeof productData.defaultImage === "string" && productData.defaultImage) {
             defImgs = [productData.defaultImage];
           } else if (productData.imageUrls && productData.imageUrls["default"]) {
-            // Fallback if defaultImage field is empty but "default" key exists in map
             defImgs = productData.imageUrls["default"];
           }
           setDefaultImageUrls(defImgs);
-
           setImageUrls(productData.imageUrls || {});
-          // @ts-ignore
           setProductReviews(productData.reviews || []);
         }
       } catch (err) {
-        console.error("Error fetching product:", err);
+        console.error(err);
       }
     };
-
     fetchProduct();
   }, [productId]);
 
@@ -107,8 +90,8 @@ const EditProduct: React.FC = () => {
   };
 
   const handleDeleteImage = async (color: string, imageUrl: string) => {
+    if (!confirm("Permanently delete this visual asset?")) return;
     const imageRef = ref(storage, imageUrl);
-
     try {
       await deleteObject(imageRef);
       setImageUrls((prev) => ({
@@ -116,77 +99,53 @@ const EditProduct: React.FC = () => {
         [color]: prev[color].filter((url) => url !== imageUrl),
       }));
     } catch (error) {
-      console.error("Error deleting image: ", error);
+      console.error(error);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const categoriesArray = categories.split(",").map((item) => item.trim().toLowerCase()).filter(item => item !== "");
-    const featuresArray = features.split(",").map((item) => item.trim()).filter(item => item !== "");
-    const sizesArray = sizes.split(",").map((item) => item.trim()).filter(item => item !== "");
+    setLoading(true);
+    try {
+      const categoriesArray = categories.split(",").map((item) => item.trim().toLowerCase()).filter(item => item !== "");
+      const featuresArray = features.split(",").map((item) => item.trim()).filter(item => item !== "");
+      const sizesArray = sizes.split(",").map((item) => item.trim()).filter(item => item !== "");
+      const newImageUrls = { ...imageUrls };
 
-    const newImageUrls = { ...imageUrls };
-
-    // Handle Default Images (Upload new files)
-    const uploadedDefaultUrls: string[] = [];
-    if (defaultImageFiles.length > 0) {
-      for (const file of defaultImageFiles) {
-        const sanitizedName = name.replace(/[^a-zA-Z0-9]/g, "_");
-        const sanitizedFileName = file.name.replace(/\s+/g, "_");
-        const timestamp = Date.now();
-        const defaultImageRef = ref(
-          storage,
-          `shoes/${sanitizedName}/default/${timestamp}_${sanitizedFileName}`
-        );
-        try {
+      const uploadedDefaultUrls: string[] = [];
+      if (defaultImageFiles.length > 0) {
+        for (const file of defaultImageFiles) {
+          const sanitizedName = name.replace(/[^a-zA-Z0-9]/g, "_");
+          const sanitizedFileName = file.name.replace(/\s+/g, "_");
+          const timestamp = Date.now();
+          const defaultImageRef = ref(storage, `shoes/${sanitizedName}/default/${timestamp}_${sanitizedFileName}`);
           await uploadBytes(defaultImageRef, file);
           const url = await getDownloadURL(defaultImageRef);
           uploadedDefaultUrls.push(url);
-        } catch (err) {
-          console.error("Error uploading default image:", err);
-          // alert? continue?
         }
       }
-    }
 
-    // Combine existing valid default URLs with newly uploaded ones
-    const finalDefaultUrls = [...defaultImageUrls, ...uploadedDefaultUrls];
-    newImageUrls["default"] = finalDefaultUrls;
+      const finalDefaultUrls = [...defaultImageUrls, ...uploadedDefaultUrls];
+      newImageUrls["default"] = finalDefaultUrls;
+      const primaryDefaultImage = finalDefaultUrls.length > 0 ? finalDefaultUrls[0] : "";
 
-    // Determine the "Primary" default image (fallback for single-string usage or thumbnail)
-    const primaryDefaultImage = finalDefaultUrls.length > 0 ? finalDefaultUrls[0] : "";
-
-    // 2. Upload new color images (Sequential)
-    // Using for...of loop ensures sequential execution to prevent rate limiting or race conditions
-    for (const color of colors) {
-      if (imageFiles[color] && imageFiles[color].length > 0) {
-        newImageUrls[color] = newImageUrls[color] || [];
-
-        for (const file of imageFiles[color]) {
-          const sanitizedName = name.replace(/[^a-zA-Z0-9]/g, "_");
-          const sanitizedColor = color.replace(/[^a-zA-Z0-9]/g, "_");
-          const sanitizedFileName = file.name.replace(/\s+/g, "_");
-          const timestamp = Date.now();
-
-          const imageRef = ref(storage, `shoes/${sanitizedName}/${sanitizedColor}/${timestamp}_${sanitizedFileName}`);
-
-          try {
+      for (const color of colors) {
+        if (imageFiles[color] && imageFiles[color].length > 0) {
+          newImageUrls[color] = newImageUrls[color] || [];
+          for (const file of imageFiles[color]) {
+            const sanitizedName = name.replace(/[^a-zA-Z0-9]/g, "_");
+            const sanitizedColor = color.replace(/[^a-zA-Z0-9]/g, "_");
+            const sanitizedFileName = file.name.replace(/\s+/g, "_");
+            const timestamp = Date.now();
+            const imageRef = ref(storage, `shoes/${sanitizedName}/${sanitizedColor}/${timestamp}_${sanitizedFileName}`);
             await uploadBytes(imageRef, file);
             const downloadURL = await getDownloadURL(imageRef);
             newImageUrls[color].push(downloadURL);
-          } catch (err) {
-            console.error(`Error uploading image for color ${color}:`, err);
-            // Continue with other images even if one fails, or alert user?
-            // For now, logging error is safer than crashing entire submit
           }
         }
       }
-    }
 
-    // Update product details in Firestore
-    if (!productId) return;
-    try {
+      if (!productId) return;
       await updateDoc(doc(db, "products", productId), {
         name,
         price: parseFloat(price),
@@ -200,256 +159,170 @@ const EditProduct: React.FC = () => {
         details: details,
         defaultColorName: defaultColorName,
       });
-      alert("Product updated successfully");
-
-      // Clear file inputs after successful upload to prevent double uploading if user clicks update again mistakenly
+      toast({
+        variant: "success",
+        title: "Asset Synchronized",
+        description: "Registry modifications have been successfully archived.",
+      });
       setImageFiles({});
       setDefaultImageFiles([]);
       setDefaultImageUrls(finalDefaultUrls);
-      // We could also reload the page or navigate, but keeping state allows further edits
-
     } catch (error) {
-      console.error("Error updating document: ", error);
-      alert("Failed to update product database.");
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Synchronization Failed",
+        description: "Encountered a protocol error during data persistence.",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
+  const inputClass = "w-full bg-white border border-slate-200 rounded-[1.5rem] px-6 py-4 text-sm font-bold text-slate-700 focus:outline-none focus:ring-4 focus:ring-green-500/10 focus:border-green-500 transition-all placeholder:text-slate-300 placeholder:font-medium";
+  const labelClass = "block text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-3 ml-2";
+
   return (
-    <div className="container mx-auto p-6 bg-white rounded shadow-md">
-      <h1 className="text-3xl font-bold text-center mb-6">Edit Product</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-gray-700 font-semibold">Name</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-gray-700 font-semibold">Price</label>
-          <input
-            type="number"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-gray-700 font-semibold">
-            Categories (comma separated)
-          </label>
-          <input
-            type="text"
-            value={categories}
-            onChange={(e) => setCategories(e.target.value)}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-          />
-        </div>
-        <div>
-          <label className="block text-gray-700 font-semibold">Add Color</label>
-          <div className="flex items-center">
-            <input
-              type="text"
-              value={colorInput}
-              onChange={(e) => setColorInput(e.target.value)}
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-            />
-            <button
-              type="button"
-              onClick={handleAddColor}
-              className="ml-2 px-4 py-3 bg-black text-white font-bold rounded-xl hover:bg-gray-800 transition-all shadow-md hover:scale-105 active:scale-95"
-            >
-              Add Color
-            </button>
+    <div className="max-w-5xl mx-auto space-y-12 pb-20 font-satoshi">
+      <div className="flex flex-col gap-2 text-center">
+        <h2 className="text-5xl font-black tracking-tighter text-slate-900">Modify Registry Asset</h2>
+        <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.5em] ml-1">Asset Hash: {productId?.slice(0, 12)}</p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-10">
+        <div className="bg-white rounded-[2.5rem] p-10 shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-slate-50">
+          <div className="flex items-center gap-3 mb-10 pb-5 border-b border-slate-50">
+            <div className="w-1.5 h-6 bg-green-500 rounded-full"></div>
+            <h3 className="text-lg font-black tracking-tight text-slate-800 uppercase tracking-[0.1em]">Core Integrity</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-2">
+              <label className={labelClass}>Asset Designation</label>
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} className={inputClass} required />
+            </div>
+            <div className="space-y-2">
+              <label className={labelClass}>Market Value (INR)</label>
+              <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} className={inputClass} required />
+            </div>
+            <div className="space-y-2">
+              <label className={labelClass}>Category Spectrum (CSV)</label>
+              <input type="text" value={categories} onChange={(e) => setCategories(e.target.value)} className={inputClass} />
+            </div>
+            <div className="space-y-2">
+              <label className={labelClass}>Active Discount (%)</label>
+              <input type="text" value={discount} onChange={(e) => setDiscount(e.target.value)} className={inputClass} />
+            </div>
           </div>
         </div>
-        {colors.map((color) => (
-          <div key={color}>
-            <label className="block text-gray-700 font-semibold">
-              Upload Images for {color}
-            </label>
-            <input
-              type="file"
-              multiple
-              onChange={(e) => handleFileChange(color, e.target.files!)}
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-            />
-            {imageUrls[color] &&
-              imageUrls[color].map((url) => (
-                <div key={url} className="relative mt-2">
-                  <img
-                    src={url}
-                    alt={`Image of ${color}`}
-                    className="w-16 h-16 object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteImage(color, url)}
-                    className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md hover:scale-110 active:scale-90 cursor-pointer"
-                  >
-                    <RxCross1 size={14} />
-                  </button>
+
+        <div className="bg-white rounded-[2.5rem] p-10 shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-slate-50">
+          <div className="flex items-center justify-between mb-10 pb-5 border-b border-slate-50">
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-6 bg-blue-500 rounded-full"></div>
+              <h3 className="text-lg font-black tracking-tight text-slate-800 uppercase tracking-[0.1em]">Visual Assets</h3>
+            </div>
+            <div className="flex gap-2">
+              <input type="text" value={colorInput} onChange={(e) => setColorInput(e.target.value)} className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-xs font-bold focus:outline-none focus:border-blue-500" placeholder="New Variant Name" />
+              <button type="button" onClick={handleAddColor} className="bg-slate-900 text-white px-5 py-2 rounded-xl font-black uppercase tracking-widest text-[9px] hover:scale-105 active:scale-95 transition-all">Add Bundle</button>
+            </div>
+          </div>
+
+          <div className="space-y-12">
+            <div className="p-8 rounded-[2rem] bg-slate-50/50 border border-slate-100">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div className="space-y-2">
+                  <label className={labelClass}>Master Color Designation</label>
+                  <input type="text" value={defaultColorName} onChange={(e) => setDefaultColorName(e.target.value)} className={inputClass} />
                 </div>
-              ))}
-          </div>
-        ))}
-        <div>
-          <label className="block text-gray-700 font-semibold">
-            Default Images & Primary Color Name
-          </label>
-          <input
-            type="text"
-            placeholder="Primary Color Name (e.g. Green)"
-            value={defaultColorName}
-            onChange={(e) => setDefaultColorName(e.target.value)}
-            className="mb-2 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300 w-full"
-          />
-          <input
-            type="file"
-            multiple
-            onChange={handleDefaultImageChange}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-          />
-
-          {/* Display Existing Default Images (URLs) */}
-          <div className="flex flex-wrap gap-2 mt-2">
-            {defaultImageUrls.map((url, index) => (
-              <div key={`def-url-${index}`} className="relative group">
-                <img
-                  src={url}
-                  alt={`Default Preview ${index}`}
-                  className="w-24 h-24 object-cover rounded shadow-sm border border-gray-200"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    const newUrls = defaultImageUrls.filter(u => u !== url);
-                    setDefaultImageUrls(newUrls);
-                    if (url.includes("firebase")) {
-                      const imageRef = ref(storage, url);
-                      deleteObject(imageRef).catch(e => console.error("Del def img err", e));
-                    }
-                  }}
-                  className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md hover:scale-110 active:scale-90 cursor-pointer"
-                >
-                  <RxCross1 size={14} />
-                </button>
+                <div className="space-y-2">
+                  <label className={labelClass}>Inject Master Angles</label>
+                  <input type="file" multiple onChange={handleDefaultImageChange} className="block w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-slate-900 file:text-white hover:file:bg-slate-800 cursor-pointer" />
+                </div>
               </div>
-            ))}
+              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4">
+                {defaultImageUrls.map((url, index) => (
+                  <div key={index} className="relative group aspect-square">
+                    <img src={url} className="w-full h-full object-cover rounded-2xl border border-slate-200" />
+                    <button type="button" onClick={() => setDefaultImageUrls(prev => prev.filter(u => u !== url))} className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-sm">×</button>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-            {/* Display Newly Selected Files */}
-            {defaultImageFiles.map((file, index) => (
-              <div key={`def-file-${index}`} className="relative group">
-                <img
-                  src={URL.createObjectURL(file)}
-                  alt="New File Preview"
-                  className="w-24 h-24 object-cover rounded shadow-sm border border-gray-200 opacity-80"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDefaultImageFiles(prev => prev.filter((_, i) => i !== index));
-                  }}
-                  className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-7 h-7 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-md hover:scale-110 active:scale-90 cursor-pointer"
-                >
-                  <RxCross1 size={14} />
-                </button>
+            {colors.map((color) => (
+              <div key={color} className="p-8 rounded-[2rem] bg-white border border-slate-100 shadow-sm">
+                <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-50">
+                  <p className="text-[10px] font-black text-slate-800 uppercase tracking-widest px-4 py-1.5 bg-slate-100 rounded-full">{color} Spectrum</p>
+                  <button type="button" onClick={() => setColors(prev => prev.filter(c => c !== color))} className="text-[10px] font-black uppercase text-rose-400 hover:text-rose-600">Delete Variant</button>
+                </div>
+                <input type="file" multiple onChange={(e) => handleFileChange(color, e.target.files!)} className="mb-6 block w-full text-xs text-slate-400 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-slate-100 file:text-slate-600 hover:file:bg-slate-200 cursor-pointer" />
+                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4">
+                  {imageUrls[color]?.map((url) => (
+                    <div key={url} className="relative group aspect-square">
+                      <img src={url} className="w-full h-full object-cover rounded-2xl border border-slate-200" />
+                      <button type="button" onClick={() => handleDeleteImage(color, url)} className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all shadow-sm">×</button>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
         </div>
-        <div>
-          <label className="block text-gray-700 font-semibold">Discount</label>
-          <input
-            type="text"
-            value={discount}
-            onChange={(e) => setDiscount(e.target.value)}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-          />
+
+        <div className="bg-white rounded-[2.5rem] p-10 shadow-[0_20px_50px_rgba(0,0,0,0.03)] border border-slate-50">
+          <div className="flex items-center gap-3 mb-10 pb-5 border-b border-slate-50">
+            <div className="w-1.5 h-6 bg-amber-500 rounded-full"></div>
+            <h3 className="text-lg font-black tracking-tight text-slate-800 uppercase tracking-[0.1em]">Metric Data</h3>
+          </div>
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <label className={labelClass}>Technical Features (CSV)</label>
+                <input type="text" value={features} onChange={(e) => setFeatures(e.target.value)} className={inputClass} />
+              </div>
+              <div className="space-y-2">
+                <label className={labelClass}>Scaling Matrix (CSV)</label>
+                <input type="text" value={sizes} onChange={(e) => setSizes(e.target.value)} className={inputClass} />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className={labelClass}>Logistical Narrative</label>
+              <textarea value={details} onChange={(e) => setDetails(e.target.value)} className={`${inputClass} min-h-[150px] resize-none`} />
+            </div>
+          </div>
         </div>
-        <div>
-          <label className="block text-gray-700 font-semibold">
-            Features (comma separated)
-          </label>
-          <input
-            type="text"
-            value={features}
-            onChange={(e) => setFeatures(e.target.value)}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-          />
-        </div>
-        <div>
-          <label className="block text-gray-700 font-semibold">
-            Sizes (comma separated)
-          </label>
-          <input
-            type="text"
-            value={sizes}
-            onChange={(e) => setSizes(e.target.value)}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-          />
-        </div>
-        <div>
-          <label className="block text-gray-700 font-semibold">
-            Product Details
-          </label>
-          <textarea
-            value={details}
-            onChange={(e) => setDetails(e.target.value)}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-            rows={4}
-          />
-        </div>
-        <button
-          type="submit"
-          className="w-full px-6 py-4 bg-black text-white font-bold rounded-xl hover:bg-gray-900 transition-all shadow-md hover:shadow-lg hover:-translate-y-1 active:scale-95"
-        >
-          Update Product
+
+        <button type="submit" disabled={loading} className={`w-full py-6 rounded-[2rem] font-black uppercase tracking-[0.4em] text-sm transition-all shadow-xl active:scale-95 ${loading ? "bg-slate-200 text-slate-400 cursor-not-allowed" : "bg-slate-900 text-white hover:bg-black shadow-slate-200 hover:-translate-y-1"}`}>
+          {loading ? "Synchronizing Asset..." : "Sync Modifications"}
         </button>
       </form>
 
-      <div className="mt-10 border-t pt-8">
-        <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
-        {/* @ts-ignore */}
-        {name && (!productReviews || productReviews.length === 0) ? (
-          <p className="text-gray-500">No reviews yet.</p>
+      <div className="mt-20 space-y-8">
+        <div className="flex items-center gap-3 ml-2">
+          <div className="w-2 h-2 rounded-full bg-rose-500"></div>
+          <h2 className="text-xl font-black uppercase tracking-[0.1em] text-slate-800">Consumer Feedback Archive</h2>
+        </div>
+
+        {productReviews.length === 0 ? (
+          <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 text-center text-slate-400 font-bold uppercase tracking-widest text-xs">Zero verification records in database</div>
         ) : (
-          // @ts-ignore
-          <div className="space-y-4">
-            {/* @ts-ignore */}
-            {productReviews?.map((review, index) => (
-              <div key={index} className="border p-4 rounded-md bg-gray-50">
-                <div className="flex items-center gap-3 mb-2">
-                  {review.reviewerPhoto ? (
-                    <img
-                      src={review.reviewerPhoto}
-                      alt={review.reviewerName || "User"}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 font-bold">
-                      {(review.reviewerName && review.reviewerName.length > 0) ? review.reviewerName.charAt(0).toUpperCase() : "U"}
-                    </div>
-                  )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {productReviews.map((review, index) => (
+              <div key={index} className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl overflow-hidden ring-4 ring-slate-50">
+                    <img src={review.reviewerPhoto || `https://ui-avatars.com/api/?name=${review.reviewerName}`} className="w-full h-full object-cover" />
+                  </div>
                   <div>
-                    <span className="font-semibold block">{review.reviewerName}</span>
-                    <span className="text-sm text-gray-500 block">{review.date}</span>
+                    <p className="font-black text-slate-800 text-sm">{review.reviewerName}</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{review.date}</p>
+                  </div>
+                  <div className="ml-auto bg-amber-50 px-3 py-1 rounded-full flex items-center gap-1">
+                    <span className="text-[10px] font-black text-amber-600">{review.rating}</span>
+                    <span className="text-xs">⭐</span>
                   </div>
                 </div>
-                <div className="mb-2">
-                  <Rating
-                    readonly
-                    initialValue={review.rating}
-                    size={20}
-                    allowFraction={true}
-                    SVGstyle={{ display: "inline-block" }}
-                  />
-                </div>
-                <p className="text-gray-700">{review.reviewText}</p>
+                <p className="text-xs font-medium text-slate-600 leading-relaxed italic">"{review.reviewText}"</p>
               </div>
             ))}
           </div>

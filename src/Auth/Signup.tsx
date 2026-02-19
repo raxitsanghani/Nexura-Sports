@@ -75,7 +75,7 @@ const Signup = () => {
       await updateProfile(newUser, { displayName: user.name });
       await createDoc(newUser, user.name, user.phone);
 
-      toast({ description: "User created!" });
+      toast({ variant: "success", description: "User created!" });
       form.reset();
       navigate("/");
     } catch (error) {
@@ -114,7 +114,7 @@ const Signup = () => {
       .then(async (result) => {
         const user = result.user;
         await createDoc(user);
-        toast({ description: "Login Success!" });
+        toast({ variant: "success", description: "Login Success!" });
         navigate("/");
       })
       .catch((error) => {

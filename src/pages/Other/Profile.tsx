@@ -130,7 +130,7 @@ const Profile: React.FC = () => {
       const userRef = doc(db, `users/${user.uid}`);
       await updateDoc(userRef, { profilePic: downloadURL });
 
-      toast({ title: "Profile picture updated!" });
+      toast({ variant: "success", title: "Profile picture updated!" });
       setCropperOpen(false);
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -152,7 +152,7 @@ const Profile: React.FC = () => {
         addresses,
         cards,
       });
-      toast({ title: "Profile updated!" });
+      toast({ variant: "success", title: "Profile updated!" });
       setEditMode(false);
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -188,7 +188,7 @@ const Profile: React.FC = () => {
         zipcode: "",
         mobile: "",
       });
-      toast({ title: "Address added!" });
+      toast({ variant: "success", title: "Address added!" });
     } catch (error) {
       console.error("Error adding address:", error);
       toast({
@@ -213,7 +213,7 @@ const Profile: React.FC = () => {
         name: "",
         expiry: "",
       });
-      toast({ title: "Card added!" });
+      toast({ variant: "success", title: "Card added!" });
     } catch (error) {
       console.error("Error adding card:", error);
       toast({
@@ -233,7 +233,7 @@ const Profile: React.FC = () => {
       const userRef = doc(db, `users/${user.uid}`);
       await updateDoc(userRef, { addresses: updatedAddresses });
 
-      toast({ title: "Address deleted!" });
+      toast({ variant: "success", title: "Address deleted!" });
     } catch (error) {
       console.error("Error deleting address:", error);
       toast({
@@ -253,7 +253,7 @@ const Profile: React.FC = () => {
       const userRef = doc(db, `users/${user.uid}`);
       await updateDoc(userRef, { cards: updatedCards });
 
-      toast({ title: "Card deleted!" });
+      toast({ variant: "success", title: "Card deleted!" });
     } catch (error) {
       console.error("Error deleting card:", error);
       toast({
@@ -266,7 +266,7 @@ const Profile: React.FC = () => {
   const logoutFnc = async (): Promise<void> => {
     try {
       await signOut(auth);
-      toast({ title: "Logged out successfully!" });
+      toast({ variant: "success", title: "Logged out successfully!" });
       navigate("/login");
     } catch (error) {
       toast({ variant: "destructive", title: (error as Error).message });

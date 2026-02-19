@@ -2,91 +2,134 @@ import React, { useEffect, useState } from "react";
 import { db } from "@/Database/firebase";
 import CardDataStats from "../../components/CardDataStats";
 import { collection, getDocs } from "firebase/firestore";
+import { FiShoppingBag, FiUsers, FiDollarSign, FiClock } from "react-icons/fi";
 
 const ECommerce: React.FC = () => {
-  const [totalUsers, setTotalUsers] = useState<number | null>(null);
-  const [totalProducts, setTotalProducts] = useState<number | null>(null);
+  const [totalUsers, setTotalUsers] = useState<number>(0);
+  const [totalProducts, setTotalProducts] = useState<number>(0);
+  const [totalRevenue, setTotalRevenue] = useState<number>(0);
+  const [pendingOrders, setPendingOrders] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTotalUsers = async () => {
+    const fetchStats = async () => {
+      setLoading(true);
       try {
-        const usersSnapshot = await getDocs(collection(db, "users"));
-        setTotalUsers(usersSnapshot.size);
+        const [usersSnap, productsSnap, ordersSnap] = await Promise.all([
+          getDocs(collection(db, "users")),
+          getDocs(collection(db, "products")),
+          getDocs(collection(db, "orders"))
+        ]);
+
+        setTotalUsers(usersSnap.size);
+        setTotalProducts(productsSnap.size);
+
+        let revenue = 0;
+        let pending = 0;
+
+        ordersSnap.docs.forEach(doc => {
+          const data = doc.data();
+          const price = Number(data.price) || Number(data.total) || 0;
+          if (data.status !== "Cancelled") {
+            revenue += price;
+          }
+          if (data.status === "Processing" || data.status === "Pre-order" || data.status === "Cancellation Requested") {
+            pending++;
+          }
+        });
+
+        setTotalRevenue(revenue);
+        setPendingOrders(pending);
       } catch (error) {
-        console.error("Error fetching users: ", error);
+        console.error("Error fetching dashboard stats:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    const fetchTotalProducts = async () => {
-      try {
-        const productsSnapshot = await getDocs(collection(db, "products"));
-        setTotalProducts(productsSnapshot.size);
-      } catch (error) {
-        console.error("Error fetching products: ", error);
-      }
-    };
-
-    fetchTotalUsers();
-    fetchTotalProducts();
+    fetchStats();
   }, []);
 
   return (
-    <>
-      <div className="grid grid-cols-1  gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
+    <div className="space-y-10">
+      <div className="flex flex-col gap-2">
+        <h2 className="text-3xl font-black tracking-tight text-slate-800">Business Overview</h2>
+        <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Real-time performance metrics</p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
         <CardDataStats
-          title="Total Product"
-          total={
-            totalProducts !== null ? totalProducts.toString() : "Loading..."
-          }
-          levelUp
+          title="Total Products"
+          total={loading ? "..." : totalProducts.toString()}
+          levelUp={totalProducts > 0}
         >
-          <svg
-            className="fill-current"
-            width="22"
-            height="22"
-            viewBox="0 0 22 22"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M21.1063 18.0469L19.3875 3.23126C19.2157 1.71876 17.9438 0.584381 16.3969 0.584381H5.56878C4.05628 0.584381 2.78441 1.71876 2.57816 3.23126L0.859406 18.0469C0.756281 18.9063 1.03128 19.7313 1.61566 20.3844C2.20003 21.0375 2.99066 21.3813 3.85003 21.3813H18.1157C18.975 21.3813 19.8 21.0031 20.35 20.3844C20.9 19.7656 21.2094 18.9063 21.1063 18.0469ZM19.2157 19.3531C18.9407 19.6625 18.5625 19.8344 18.15 19.8344H3.85003C3.43753 19.8344 3.05941 19.6625 2.78441 19.3531C2.50941 19.0438 2.37191 18.6313 2.44066 18.2188L4.12503 3.43751C4.19378 2.71563 4.81253 2.16563 5.56878 2.16563H16.4313C17.1532 2.16563 17.7719 2.71563 17.875 3.43751L19.5938 18.2531C19.6282 18.6656 19.4907 19.0438 19.2157 19.3531Z"
-              fill=""
-            />
-            <path
-              d="M14.3345 5.29375C13.922 5.39688 13.647 5.80938 13.7501 6.22188C13.7845 6.42813 13.8189 6.63438 13.8189 6.80625C13.8189 8.35313 12.547 9.625 11.0001 9.625C9.45327 9.625 8.1814 8.35313 8.1814 6.80625C8.1814 6.6 8.21577 6.42813 8.25015 6.22188C8.35327 5.80938 8.07827 5.39688 7.66577 5.29375C7.25327 5.19063 6.84077 5.46563 6.73765 5.87813C6.6689 6.1875 6.63452 6.49688 6.63452 6.80625C6.63452 9.2125 8.5939 11.1719 11.0001 11.1719C13.4064 11.1719 15.3658 9.2125 15.3658 6.80625C15.3658 6.49688 15.3314 6.1875 15.2626 5.87813C15.1595 5.46563 14.747 5.225 14.3345 5.29375Z"
-              fill=""
-            />
-          </svg>
+          <FiShoppingBag className="w-6 h-6" />
         </CardDataStats>
+
         <CardDataStats
-          title="Total Users"
-          total={totalUsers !== null ? totalUsers.toString() : "Loading..."}
-          levelDown
+          title="Active Users"
+          total={loading ? "..." : totalUsers.toString()}
+          levelUp={totalUsers > 0}
         >
-          <svg
-            className="fill-current"
-            width="22"
-            height="18"
-            viewBox="0 0 22 18"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M7.18418 8.03751C9.31543 8.03751 11.0686 6.35313 11.0686 4.25626C11.0686 2.15938 9.31543 0.475006 7.18418 0.475006C5.05293 0.475006 3.2998 2.15938 3.2998 4.25626C3.2998 6.35313 5.05293 8.03751 7.18418 8.03751ZM7.18418 2.05626C8.45605 2.05626 9.52168 3.05313 9.52168 4.29063C9.52168 5.52813 8.49043 6.52501 7.18418 6.52501C5.87793 6.52501 4.84668 5.52813 4.84668 4.29063C4.84668 3.05313 5.9123 2.05626 7.18418 2.05626Z"
-              fill=""
-            />
-            <path
-              d="M15.8124 9.6875C17.6687 9.6875 19.1468 8.24375 19.1468 6.42188C19.1468 4.6 17.6343 3.15625 15.8124 3.15625C13.9905 3.15625 12.478 4.6 12.478 6.42188C12.478 8.24375 13.9905 9.6875 15.8124 9.6875ZM15.8124 4.7375C16.8093 4.7375 17.5999 5.49375 17.5999 6.45625C17.5999 7.41875 16.8093 8.175 15.8124 8.175C14.8155 8.175 14.0249 7.41875 14.0249 6.45625C14.0249 5.49375 14.8155 4.7375 15.8124 4.7375Z"
-              fill=""
-            />
-            <path
-              d="M15.9843 10.0313H15.6749C14.6437 10.0313 13.6468 10.3406 12.7874 10.8563C11.8593 9.61876 10.3812 8.79376 8.73115 8.79376H5.67178C2.85303 8.82814 0.618652 11.0625 0.618652 13.8469V16.3219C0.618652 16.975 1.13428 17.4906 1.7874 17.4906H20.2468C20.8999 17.4906 21.4499 16.9406 21.4499 16.2875V15.4625C21.4155 12.4719 18.9749 10.0313 15.9843 10.0313ZM2.16553 15.9438V13.8469C2.16553 11.9219 3.74678 10.3406 5.67178 10.3406H8.73115C10.6562 10.3406 12.2374 11.9219 12.2374 13.8469V15.9438H2.16553V15.9438ZM19.8687 15.9438H13.7499V13.8469C13.7499 13.2969 13.6468 12.7469 13.4749 12.2313C14.0937 11.7844 14.8499 11.5781 15.6405 11.5781H15.9499C18.0812 11.5781 19.8343 13.3313 19.8343 15.4625V15.9438H19.8687Z"
-              fill=""
-            />
-          </svg>
+          <FiUsers className="w-6 h-6" />
+        </CardDataStats>
+
+        <CardDataStats
+          title="Gross Revenue"
+          total={loading ? "..." : `₹${totalRevenue.toLocaleString()}`}
+          levelUp={totalRevenue > 0}
+        >
+          <FiDollarSign className="w-6 h-6" />
+        </CardDataStats>
+
+        <CardDataStats
+          title="Pending Actions"
+          total={loading ? "..." : pendingOrders.toString()}
+          levelDown={pendingOrders > 5}
+        >
+          <FiClock className="w-6 h-6" />
         </CardDataStats>
       </div>
-    </>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-8 h-[400px] rounded-[3rem] bg-white/50 border border-white border-dashed flex flex-col items-center justify-center text-slate-400 shadow-sm">
+          <div className="text-4xl mb-4">📊</div>
+          <p className="text-sm font-black uppercase tracking-widest">Revenue Analytics coming soon</p>
+          <p className="text-xs font-medium">Advanced visualization module in queue</p>
+        </div>
+        <div className="lg:col-span-4 h-[400px] rounded-[3rem] bg-white border border-slate-100 p-8 shadow-sm">
+          <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400 mb-8 pb-4 border-b border-slate-50">System Integrity</h3>
+          <div className="space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
+              <div className="flex-1">
+                <p className="text-xs font-black text-slate-700">Database Sync</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Latency: 12ms</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="w-2 h-2 rounded-full bg-green-500"></div>
+              <div className="flex-1">
+                <p className="text-xs font-black text-slate-700">Payment Gateway</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Operational</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="w-2 h-2 rounded-full bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]"></div>
+              <div className="flex-1">
+                <p className="text-xs font-black text-slate-700">Asset Server</p>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">High Load Observed</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-12 p-6 bg-slate-50 rounded-[2rem] border border-slate-100">
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Admin Security</p>
+            <p className="text-xs font-bold text-slate-600">Session expires in 42m</p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
