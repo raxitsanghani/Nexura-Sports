@@ -8,7 +8,7 @@ const SignIn = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim() === "raxitsanghani21@gmail.com" && password.trim() === "raxit2112") {
+    if (email.trim() === import.meta.env.VITE_ADMIN_EMAIL && password.trim() === import.meta.env.VITE_ADMIN_PASSWORD) {
       login("login-token");
     } else {
       alert("Unauthorized Access Detected: Invalid Credentials");

@@ -50,7 +50,7 @@ const Login = () => {
 
   const handleLogin = (user: z.infer<typeof LoginValidation>) => {
     setLoading(true);
-    if (user.email === "raxitsanghani21@gmail.com" && user.password === "raxit2112") {
+    if (user.email === import.meta.env.VITE_ADMIN_EMAIL && user.password === import.meta.env.VITE_ADMIN_PASSWORD) {
       localStorage.setItem("authToken", "admin-token");
       toast({ variant: "success", description: "Admin Login Success!" });
       setLoading(false);
