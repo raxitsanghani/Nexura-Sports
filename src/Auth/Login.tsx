@@ -48,16 +48,40 @@ const Login = () => {
     },
   });
 
-  const handleLogin = (user: z.infer<typeof LoginValidation>) => {
+  const handleLogin = async (user: z.infer<typeof LoginValidation>) => {
     setLoading(true);
-    if (user.email === import.meta.env.VITE_ADMIN_EMAIL && user.password === import.meta.env.VITE_ADMIN_PASSWORD) {
-      localStorage.setItem("authToken", "admin-token");
-      toast({ variant: "success", description: "Admin Login Success!" });
-      setLoading(false);
-      window.location.href = "/admin";
-      return;
+
+    // 1. Secure Admin Authentication (Server-side check)
+    try {
+      const adminRes = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: user.email, password: user.password }),
+      });
+
+      if (adminRes.ok) {
+        const data = await adminRes.json();
+        localStorage.setItem("adminToken", data.token);
+        toast({ variant: "success", description: "Admin Login Success!" });
+        setLoading(false);
+        window.location.href = "/admin";
+        return;
+      } else if (adminRes.status === 401 && user.email.includes("raxit")) {
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: "Invalid Admin Credentials"
+        });
+        setLoading(false);
+        return;
+      }
+    } catch (error) {
+      console.error("Admin Auth API Error:", error);
     }
 
+    // 2. Standard User Authentication (Firebase)
     signInWithEmailAndPassword(auth, user.email, user.password)
       .then(async (userCredential) => {
         const userRef = doc(db, "users", userCredential.user.uid);

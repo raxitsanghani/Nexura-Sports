@@ -19,27 +19,51 @@ const AuthContext = createContext<AuthContextType>({
 // AuthProvider component
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      setIsAuthenticated(true);
-    }
+    const checkAuth = async () => {
+      const token = localStorage.getItem("adminToken");
+      if (token) {
+        try {
+          const res = await fetch('/api/admin/verify', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (res.ok) {
+            setIsAuthenticated(true);
+          } else {
+            localStorage.removeItem("adminToken");
+            setIsAuthenticated(false);
+          }
+        } catch (error) {
+          console.error("Auth verification failed", error);
+          setIsAuthenticated(false);
+        }
+      }
+      setLoading(false);
+    };
+
+    checkAuth();
   }, []);
 
   const login = (token: string) => {
-    localStorage.setItem("authToken", token);
+    localStorage.setItem("adminToken", token);
     setIsAuthenticated(true);
-    navigate("/admin"); // Redirect to the admin dashboard after login
+    navigate("/admin");
   };
 
   const logout = () => {
-    localStorage.removeItem("authToken");
-    console.log("called");
+    localStorage.removeItem("adminToken");
     setIsAuthenticated(false);
-    navigate("/admin/auth/signin"); // Redirect to login page on logout
+    navigate("/login"); // Redirect to main login
   };
+
+  if (loading) {
+    return null; // Or a loading spinner
+  }
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
